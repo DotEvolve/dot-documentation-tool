@@ -1,0 +1,37 @@
+{
+  "name": "@dotevolve/documentation-tool",
+  "version": "1.0.0",
+  "description": "Automated JSDoc documentation generator for DotEvolve projects",
+  "main": "dist/index.js",
+  "scripts": {
+    "build": "tsc",
+    "test": "jest",
+    "test:unit": "jest __tests__/unit",
+    "test:property": "jest __tests__/property",
+    "test:watch": "jest --watch",
+    "test:coverage": "jest --coverage"
+  },
+  "keywords": [
+    "documentation",
+    "jsdoc",
+    "code-analysis",
+    "ast"
+  ],
+  "author": "",
+  "license": "MIT",
+  "devDependencies": {
+    "@types/babel__traverse": "^7.20.5",
+    "@types/jest": "^29.5.11",
+    "@types/node": "^20.19.35",
+    "jest": "^29.7.0",
+    "ts-jest": "^29.1.1",
+    "typescript": "^5.3.3"
+  },
+  "dependencies": {
+    "@babel/parser": "^7.23.6",
+    "@babel/traverse": "^7.23.6",
+    "@babel/types": "^7.23.6",
+    "commander": "^14.0.3",
+    "fast-check": "^3.15.0"
+  }
+}
