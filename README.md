@@ -1,6 +1,6 @@
-# Documentation Tool
+# DotEvolve Documentation Tool
 
-Automated JSDoc documentation generator for dot-cOS services.
+Automated JSDoc documentation generator for DotEvolve projects and dot-cOS services.
 
 ## Overview
 
