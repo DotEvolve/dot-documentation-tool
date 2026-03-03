@@ -1,11 +1,11 @@
-import * as fs from 'fs';
-import * as path from 'path';
+import * as fs from "fs";
+import * as path from "path";
 
-describe('CLI Integration Tests', () => {
+describe("CLI Integration Tests", () => {
   let tempDir: string;
 
   beforeEach(() => {
-    tempDir = path.join(__dirname, 'temp-cli-test');
+    tempDir = path.join(__dirname, "temp-cli-test");
     if (!fs.existsSync(tempDir)) {
       fs.mkdirSync(tempDir, { recursive: true });
     }
@@ -15,7 +15,7 @@ describe('CLI Integration Tests', () => {
     // Clean up temp files
     if (fs.existsSync(tempDir)) {
       const files = fs.readdirSync(tempDir);
-      files.forEach(file => {
+      files.forEach((file) => {
         const filePath = path.join(tempDir, file);
         if (fs.statSync(filePath).isDirectory()) {
           fs.rmSync(filePath, { recursive: true });
@@ -27,14 +27,14 @@ describe('CLI Integration Tests', () => {
     }
   });
 
-  it('should compile without errors', () => {
+  it("should compile without errors", () => {
     // This test just verifies the CLI file compiles
     expect(true).toBe(true);
   });
 
-  it('should have proper exports', () => {
+  it("should have proper exports", () => {
     // Verify the CLI module structure
-    const cliPath = path.join(__dirname, '../../src/cli.ts');
+    const cliPath = path.join(__dirname, "../../src/cli.ts");
     expect(fs.existsSync(cliPath)).toBe(true);
   });
 });

@@ -32,6 +32,7 @@ node dist/cli.js file <path-to-file>
 ```
 
 Example:
+
 ```bash
 node dist/cli.js file src/utils/helper.ts
 ```
@@ -43,6 +44,7 @@ node dist/cli.js directory <path-to-directory>
 ```
 
 Example:
+
 ```bash
 node dist/cli.js directory src/
 ```
@@ -85,7 +87,7 @@ Create a `.docrc.json` file in your project root:
 
 - **excludePatterns**: Array of directory/file patterns to exclude
 - **style.lineLength**: Maximum line length for comments (default: 80)
-- **style.indentation**: Indentation string (default: "  ")
+- **style.indentation**: Indentation string (default: " ")
 - **glossary**: Map of incorrect terms to correct terms for terminology validation
 
 ## Project Structure
@@ -131,30 +133,39 @@ npx tsc --noEmit
 The tool consists of several key components:
 
 ### CodeAnalyzer
+
 Parses JavaScript/TypeScript files using Babel and extracts code elements (functions, classes, routes, etc.)
 
 ### JSDocGenerator
+
 Generates JSDoc comments from code elements with:
+
 - Meaningful descriptions based on function names
 - Parameter documentation with types
 - Return type documentation
 - Error/exception documentation
 
 ### DocumentationValidator
+
 Validates JSDoc comments for:
+
 - Syntax correctness
 - Completeness (all params documented)
 - Non-redundancy (meaningful descriptions)
 - Terminology consistency
 
 ### DocumentationInserter
+
 Inserts generated JSDoc comments into source files while:
+
 - Preserving existing code structure
 - Detecting and avoiding conflicts with existing docs
 - Maintaining proper indentation
 
 ### Service-Specific Handlers
+
 Specialized documentation for:
+
 - **API Gateway**: Authentication middleware, proxy routing
 - **Workflow Service**: Prisma models, business logic
 - **Rule Engine**: RabbitMQ integration, webhooks

@@ -1,36 +1,43 @@
 /**
  * Unit tests for SideEffectDetector - Error Detection
- * 
+ *
  * Tests for Task 4.2: Implement error detection
  * Requirements: 2.4, 8.1, 8.2
  */
 
-import { detectErrorHandling } from '../../src/analyzers/SideEffectDetector';
-import { ErrorPatternType } from '../../src/types';
-import { parse } from '@babel/parser';
+import { detectErrorHandling } from "../../src/analyzers/SideEffectDetector";
+import { ErrorPatternType } from "../../src/types";
+import { parse } from "@babel/parser";
 
-describe('SideEffectDetector - Error Detection', () => {
+describe("SideEffectDetector - Error Detection", () => {
   /**
    * Helper function to parse code and extract the first function node
    */
   function parseFunction(code: string): any {
     const ast = parse(code, {
-      sourceType: 'module',
-      plugins: ['typescript']
+      sourceType: "module",
+      plugins: ["typescript"],
     });
 
     // Find the first function declaration, expression, or arrow function
     for (const node of ast.program.body) {
-      if (node.type === 'FunctionDeclaration') {
+      if (node.type === "FunctionDeclaration") {
         return node;
       }
-      if (node.type === 'VariableDeclaration') {
+      if (node.type === "VariableDeclaration") {
         const init = node.declarations[0]?.init;
-        if (init && (init.type === 'FunctionExpression' || init.type === 'ArrowFunctionExpression')) {
+        if (
+          init &&
+          (init.type === "FunctionExpression" ||
+            init.type === "ArrowFunctionExpression")
+        ) {
           return init;
         }
       }
-      if (node.type === 'ExpressionStatement' && node.expression.type === 'FunctionExpression') {
+      if (
+        node.type === "ExpressionStatement" &&
+        node.expression.type === "FunctionExpression"
+      ) {
         return node.expression;
       }
     }
@@ -38,8 +45,8 @@ describe('SideEffectDetector - Error Detection', () => {
     return null;
   }
 
-  describe('Try-Catch Block Detection', () => {
-    it('should detect basic try-catch block', () => {
+  describe("Try-Catch Block Detection", () => {
+    it("should detect basic try-catch block", () => {
       const code = `
         function test() {
           try {
@@ -55,10 +62,10 @@ describe('SideEffectDetector - Error Detection', () => {
 
       expect(patterns).toHaveLength(1);
       expect(patterns[0].type).toBe(ErrorPatternType.TRY_CATCH);
-      expect(patterns[0].description).toContain('Catches and handles errors');
+      expect(patterns[0].description).toContain("Catches and handles errors");
     });
 
-    it('should detect try-catch with typed error (TypeScript)', () => {
+    it("should detect try-catch with typed error (TypeScript)", () => {
       const code = `
         function test() {
           try {
@@ -74,11 +81,13 @@ describe('SideEffectDetector - Error Detection', () => {
 
       expect(patterns).toHaveLength(1);
       expect(patterns[0].type).toBe(ErrorPatternType.TRY_CATCH);
-      expect(patterns[0].errorType).toBe('Error');
-      expect(patterns[0].description).toContain('Catches and handles Error errors');
+      expect(patterns[0].errorType).toBe("Error");
+      expect(patterns[0].description).toContain(
+        "Catches and handles Error errors",
+      );
     });
 
-    it('should detect try-catch with instanceof check', () => {
+    it("should detect try-catch with instanceof check", () => {
       const code = `
         function test() {
           try {
@@ -96,11 +105,11 @@ describe('SideEffectDetector - Error Detection', () => {
 
       expect(patterns).toHaveLength(1);
       expect(patterns[0].type).toBe(ErrorPatternType.TRY_CATCH);
-      expect(patterns[0].errorType).toBe('ValidationError');
-      expect(patterns[0].description).toContain('ValidationError');
+      expect(patterns[0].errorType).toBe("ValidationError");
+      expect(patterns[0].description).toContain("ValidationError");
     });
 
-    it('should detect try-catch with finally block', () => {
+    it("should detect try-catch with finally block", () => {
       const code = `
         function test() {
           try {
@@ -117,10 +126,12 @@ describe('SideEffectDetector - Error Detection', () => {
       const patterns = detectErrorHandling(funcNode);
 
       expect(patterns.length).toBeGreaterThanOrEqual(2);
-      expect(patterns.some(p => p.description.includes('finally block'))).toBe(true);
+      expect(
+        patterns.some((p) => p.description.includes("finally block")),
+      ).toBe(true);
     });
 
-    it('should detect try-catch without error parameter', () => {
+    it("should detect try-catch without error parameter", () => {
       const code = `
         function test() {
           try {
@@ -136,10 +147,12 @@ describe('SideEffectDetector - Error Detection', () => {
 
       expect(patterns).toHaveLength(1);
       expect(patterns[0].type).toBe(ErrorPatternType.TRY_CATCH);
-      expect(patterns[0].description).toContain('without accessing error object');
+      expect(patterns[0].description).toContain(
+        "without accessing error object",
+      );
     });
 
-    it('should detect try-catch with union type (TypeScript)', () => {
+    it("should detect try-catch with union type (TypeScript)", () => {
       const code = `
         function test() {
           try {
@@ -155,13 +168,13 @@ describe('SideEffectDetector - Error Detection', () => {
 
       expect(patterns).toHaveLength(1);
       expect(patterns[0].type).toBe(ErrorPatternType.TRY_CATCH);
-      expect(patterns[0].errorType).toContain('Error');
-      expect(patterns[0].errorType).toContain('CustomError');
+      expect(patterns[0].errorType).toContain("Error");
+      expect(patterns[0].errorType).toContain("CustomError");
     });
   });
 
-  describe('Throw Statement Detection', () => {
-    it('should detect throw with new Error', () => {
+  describe("Throw Statement Detection", () => {
+    it("should detect throw with new Error", () => {
       const code = `
         function test() {
           throw new Error('Something went wrong');
@@ -173,12 +186,12 @@ describe('SideEffectDetector - Error Detection', () => {
 
       expect(patterns).toHaveLength(1);
       expect(patterns[0].type).toBe(ErrorPatternType.THROW);
-      expect(patterns[0].errorType).toBe('Error');
-      expect(patterns[0].description).toContain('Throws Error');
-      expect(patterns[0].description).toContain('Something went wrong');
+      expect(patterns[0].errorType).toBe("Error");
+      expect(patterns[0].description).toContain("Throws Error");
+      expect(patterns[0].description).toContain("Something went wrong");
     });
 
-    it('should detect throw with custom error type', () => {
+    it("should detect throw with custom error type", () => {
       const code = `
         function test() {
           throw new ValidationError('Invalid input');
@@ -190,11 +203,11 @@ describe('SideEffectDetector - Error Detection', () => {
 
       expect(patterns).toHaveLength(1);
       expect(patterns[0].type).toBe(ErrorPatternType.THROW);
-      expect(patterns[0].errorType).toBe('ValidationError');
-      expect(patterns[0].description).toContain('ValidationError');
+      expect(patterns[0].errorType).toBe("ValidationError");
+      expect(patterns[0].description).toContain("ValidationError");
     });
 
-    it('should detect throw with namespaced error', () => {
+    it("should detect throw with namespaced error", () => {
       const code = `
         function test() {
           throw new CustomErrors.ValidationError('Invalid input');
@@ -206,10 +219,10 @@ describe('SideEffectDetector - Error Detection', () => {
 
       expect(patterns).toHaveLength(1);
       expect(patterns[0].type).toBe(ErrorPatternType.THROW);
-      expect(patterns[0].errorType).toBe('CustomErrors.ValidationError');
+      expect(patterns[0].errorType).toBe("CustomErrors.ValidationError");
     });
 
-    it('should detect throw with string literal', () => {
+    it("should detect throw with string literal", () => {
       const code = `
         function test() {
           throw "Error message";
@@ -221,10 +234,10 @@ describe('SideEffectDetector - Error Detection', () => {
 
       expect(patterns).toHaveLength(1);
       expect(patterns[0].type).toBe(ErrorPatternType.THROW);
-      expect(patterns[0].description).toContain('Error message');
+      expect(patterns[0].description).toContain("Error message");
     });
 
-    it('should detect re-throwing existing error', () => {
+    it("should detect re-throwing existing error", () => {
       const code = `
         function test() {
           try {
@@ -240,12 +253,14 @@ describe('SideEffectDetector - Error Detection', () => {
       const patterns = detectErrorHandling(funcNode);
 
       expect(patterns.length).toBeGreaterThanOrEqual(2);
-      const throwPattern = patterns.find(p => p.type === ErrorPatternType.THROW);
+      const throwPattern = patterns.find(
+        (p) => p.type === ErrorPatternType.THROW,
+      );
       expect(throwPattern).toBeDefined();
-      expect(throwPattern?.errorType).toBe('existing error');
+      expect(throwPattern?.errorType).toBe("existing error");
     });
 
-    it('should detect throw with template literal message', () => {
+    it("should detect throw with template literal message", () => {
       const code = `
         function test(value) {
           throw new Error(\`Invalid value: \${value}\`);
@@ -257,11 +272,11 @@ describe('SideEffectDetector - Error Detection', () => {
 
       expect(patterns).toHaveLength(1);
       expect(patterns[0].type).toBe(ErrorPatternType.THROW);
-      expect(patterns[0].errorType).toBe('Error');
-      expect(patterns[0].description).toContain('Invalid value');
+      expect(patterns[0].errorType).toBe("Error");
+      expect(patterns[0].description).toContain("Invalid value");
     });
 
-    it('should detect multiple throw statements', () => {
+    it("should detect multiple throw statements", () => {
       const code = `
         function test(value) {
           if (value < 0) {
@@ -277,12 +292,14 @@ describe('SideEffectDetector - Error Detection', () => {
       const patterns = detectErrorHandling(funcNode);
 
       expect(patterns).toHaveLength(2);
-      expect(patterns.every(p => p.type === ErrorPatternType.THROW)).toBe(true);
+      expect(patterns.every((p) => p.type === ErrorPatternType.THROW)).toBe(
+        true,
+      );
     });
   });
 
-  describe('Express Error Middleware Detection', () => {
-    it('should detect Express error middleware with 4 parameters', () => {
+  describe("Express Error Middleware Detection", () => {
+    it("should detect Express error middleware with 4 parameters", () => {
       const code = `
         function errorHandler(err, req, res, next) {
           console.error(err);
@@ -295,8 +312,8 @@ describe('SideEffectDetector - Error Detection', () => {
 
       expect(patterns).toHaveLength(1);
       expect(patterns[0].type).toBe(ErrorPatternType.ERROR_MIDDLEWARE);
-      expect(patterns[0].description).toContain('Express error middleware');
-      expect(patterns[0].description).toContain('4 parameters');
+      expect(patterns[0].description).toContain("Express error middleware");
+      expect(patterns[0].description).toContain("4 parameters");
     });
 
     it('should detect Express error middleware with "error" parameter name', () => {
@@ -329,7 +346,7 @@ describe('SideEffectDetector - Error Detection', () => {
       expect(patterns[0].type).toBe(ErrorPatternType.ERROR_MIDDLEWARE);
     });
 
-    it('should not detect regular middleware with 3 parameters', () => {
+    it("should not detect regular middleware with 3 parameters", () => {
       const code = `
         function regularMiddleware(req, res, next) {
           console.log('Regular middleware');
@@ -340,10 +357,12 @@ describe('SideEffectDetector - Error Detection', () => {
       const funcNode = parseFunction(code);
       const patterns = detectErrorHandling(funcNode);
 
-      expect(patterns.filter(p => p.type === ErrorPatternType.ERROR_MIDDLEWARE)).toHaveLength(0);
+      expect(
+        patterns.filter((p) => p.type === ErrorPatternType.ERROR_MIDDLEWARE),
+      ).toHaveLength(0);
     });
 
-    it('should not detect 4-parameter function without error-like first param', () => {
+    it("should not detect 4-parameter function without error-like first param", () => {
       const code = `
         function someFunction(a, b, c, d) {
           return a + b + c + d;
@@ -353,10 +372,12 @@ describe('SideEffectDetector - Error Detection', () => {
       const funcNode = parseFunction(code);
       const patterns = detectErrorHandling(funcNode);
 
-      expect(patterns.filter(p => p.type === ErrorPatternType.ERROR_MIDDLEWARE)).toHaveLength(0);
+      expect(
+        patterns.filter((p) => p.type === ErrorPatternType.ERROR_MIDDLEWARE),
+      ).toHaveLength(0);
     });
 
-    it('should detect arrow function error middleware', () => {
+    it("should detect arrow function error middleware", () => {
       const code = `
         const errorHandler = (err, req, res, next) => {
           console.error(err);
@@ -372,8 +393,8 @@ describe('SideEffectDetector - Error Detection', () => {
     });
   });
 
-  describe('Error Handler Call Detection', () => {
-    it('should detect .catch() on promises', () => {
+  describe("Error Handler Call Detection", () => {
+    it("should detect .catch() on promises", () => {
       const code = `
         function test() {
           fetchData()
@@ -388,10 +409,10 @@ describe('SideEffectDetector - Error Detection', () => {
 
       expect(patterns).toHaveLength(1);
       expect(patterns[0].type).toBe(ErrorPatternType.ERROR_HANDLER);
-      expect(patterns[0].description).toContain('.catch()');
+      expect(patterns[0].description).toContain(".catch()");
     });
 
-    it('should detect error-first callback pattern', () => {
+    it("should detect error-first callback pattern", () => {
       const code = `
         function test() {
           fs.readFile('file.txt', (err, data) => {
@@ -409,7 +430,7 @@ describe('SideEffectDetector - Error Detection', () => {
 
       expect(patterns).toHaveLength(1);
       expect(patterns[0].type).toBe(ErrorPatternType.ERROR_HANDLER);
-      expect(patterns[0].description).toContain('error-first callback');
+      expect(patterns[0].description).toContain("error-first callback");
     });
 
     it('should detect error-first callback with "error" parameter', () => {
@@ -430,7 +451,7 @@ describe('SideEffectDetector - Error Detection', () => {
       expect(patterns[0].type).toBe(ErrorPatternType.ERROR_HANDLER);
     });
 
-    it('should detect multiple .catch() calls', () => {
+    it("should detect multiple .catch() calls", () => {
       const code = `
         function test() {
           fetchData()
@@ -444,12 +465,14 @@ describe('SideEffectDetector - Error Detection', () => {
       const funcNode = parseFunction(code);
       const patterns = detectErrorHandling(funcNode);
 
-      expect(patterns.filter(p => p.type === ErrorPatternType.ERROR_HANDLER)).toHaveLength(2);
+      expect(
+        patterns.filter((p) => p.type === ErrorPatternType.ERROR_HANDLER),
+      ).toHaveLength(2);
     });
   });
 
-  describe('Complex Error Handling Scenarios', () => {
-    it('should detect multiple error handling patterns in one function', () => {
+  describe("Complex Error Handling Scenarios", () => {
+    it("should detect multiple error handling patterns in one function", () => {
       const code = `
         function complexFunction() {
           try {
@@ -470,12 +493,18 @@ describe('SideEffectDetector - Error Detection', () => {
       const patterns = detectErrorHandling(funcNode);
 
       expect(patterns.length).toBeGreaterThanOrEqual(3);
-      expect(patterns.some(p => p.type === ErrorPatternType.TRY_CATCH)).toBe(true);
-      expect(patterns.some(p => p.type === ErrorPatternType.THROW)).toBe(true);
-      expect(patterns.some(p => p.type === ErrorPatternType.ERROR_HANDLER)).toBe(true);
+      expect(patterns.some((p) => p.type === ErrorPatternType.TRY_CATCH)).toBe(
+        true,
+      );
+      expect(patterns.some((p) => p.type === ErrorPatternType.THROW)).toBe(
+        true,
+      );
+      expect(
+        patterns.some((p) => p.type === ErrorPatternType.ERROR_HANDLER),
+      ).toBe(true);
     });
 
-    it('should detect nested try-catch blocks', () => {
+    it("should detect nested try-catch blocks", () => {
       const code = `
         function test() {
           try {
@@ -493,10 +522,12 @@ describe('SideEffectDetector - Error Detection', () => {
       const funcNode = parseFunction(code);
       const patterns = detectErrorHandling(funcNode);
 
-      expect(patterns.filter(p => p.type === ErrorPatternType.TRY_CATCH).length).toBeGreaterThanOrEqual(2);
+      expect(
+        patterns.filter((p) => p.type === ErrorPatternType.TRY_CATCH).length,
+      ).toBeGreaterThanOrEqual(2);
     });
 
-    it('should handle function with no error handling', () => {
+    it("should handle function with no error handling", () => {
       const code = `
         function test() {
           const result = calculate(1, 2);
@@ -510,7 +541,7 @@ describe('SideEffectDetector - Error Detection', () => {
       expect(patterns).toHaveLength(0);
     });
 
-    it('should handle empty function', () => {
+    it("should handle empty function", () => {
       const code = `
         function test() {}
       `;
@@ -521,19 +552,22 @@ describe('SideEffectDetector - Error Detection', () => {
       expect(patterns).toHaveLength(0);
     });
 
-    it('should handle null node', () => {
+    it("should handle null node", () => {
       const patterns = detectErrorHandling(null);
       expect(patterns).toHaveLength(0);
     });
 
-    it('should handle node without body', () => {
-      const patterns = detectErrorHandling({ type: 'FunctionDeclaration', params: [] });
+    it("should handle node without body", () => {
+      const patterns = detectErrorHandling({
+        type: "FunctionDeclaration",
+        params: [],
+      });
       expect(patterns).toHaveLength(0);
     });
   });
 
-  describe('Real-world Error Handling Patterns', () => {
-    it('should detect async/await with try-catch', () => {
+  describe("Real-world Error Handling Patterns", () => {
+    it("should detect async/await with try-catch", () => {
       const code = `
         async function fetchUser(id) {
           try {
@@ -550,11 +584,15 @@ describe('SideEffectDetector - Error Detection', () => {
       const patterns = detectErrorHandling(funcNode);
 
       expect(patterns.length).toBeGreaterThanOrEqual(2);
-      expect(patterns.some(p => p.type === ErrorPatternType.TRY_CATCH)).toBe(true);
-      expect(patterns.some(p => p.type === ErrorPatternType.THROW)).toBe(true);
+      expect(patterns.some((p) => p.type === ErrorPatternType.TRY_CATCH)).toBe(
+        true,
+      );
+      expect(patterns.some((p) => p.type === ErrorPatternType.THROW)).toBe(
+        true,
+      );
     });
 
-    it('should detect error transformation pattern', () => {
+    it("should detect error transformation pattern", () => {
       const code = `
         function processData(data) {
           try {
@@ -569,11 +607,13 @@ describe('SideEffectDetector - Error Detection', () => {
       const patterns = detectErrorHandling(funcNode);
 
       expect(patterns.length).toBeGreaterThanOrEqual(2);
-      const throwPattern = patterns.find(p => p.type === ErrorPatternType.THROW);
-      expect(throwPattern?.errorType).toBe('ValidationError');
+      const throwPattern = patterns.find(
+        (p) => p.type === ErrorPatternType.THROW,
+      );
+      expect(throwPattern?.errorType).toBe("ValidationError");
     });
 
-    it('should detect conditional error throwing', () => {
+    it("should detect conditional error throwing", () => {
       const code = `
         function validateAge(age) {
           if (age < 0) {
@@ -589,7 +629,9 @@ describe('SideEffectDetector - Error Detection', () => {
       const funcNode = parseFunction(code);
       const patterns = detectErrorHandling(funcNode);
 
-      expect(patterns.filter(p => p.type === ErrorPatternType.THROW)).toHaveLength(2);
+      expect(
+        patterns.filter((p) => p.type === ErrorPatternType.THROW),
+      ).toHaveLength(2);
     });
   });
 });

@@ -1,13 +1,13 @@
 #!/usr/bin/env node
 
-import * as fs from 'fs';
-import * as path from 'path';
-import { Command } from 'commander';
-import { CodeAnalyzer } from './analyzers/CodeAnalyzer';
-import { generateJSDoc, formatJSDoc } from './generators/JSDocGenerator';
-import { DocumentationValidator } from './validators/DocumentationValidator';
-import { DocumentationInserter } from './DocumentationInserter';
-import { Documentation } from './types';
+import * as fs from "fs";
+import * as path from "path";
+import { Command } from "commander";
+import { CodeAnalyzer } from "./analyzers/CodeAnalyzer";
+import { generateJSDoc, formatJSDoc } from "./generators/JSDocGenerator";
+import { DocumentationValidator } from "./validators/DocumentationValidator";
+import { DocumentationInserter } from "./DocumentationInserter";
+import { Documentation } from "./types";
 
 /**
  * CLI configuration options
@@ -50,7 +50,7 @@ class DocumentationCLI {
       filesProcessed: 0,
       commentsAdded: 0,
       warnings: 0,
-      errors: 0
+      errors: 0,
     };
   }
 
@@ -62,10 +62,10 @@ class DocumentationCLI {
   async documentFile(filePath: string, dryRun: boolean = false): Promise<void> {
     try {
       console.log(`Processing ${filePath}...`);
-      
+
       // Analyze the file
       const elements = this.analyzer.analyzeFile(filePath);
-      
+
       if (elements.length === 0) {
         console.log(`  No undocumented elements found`);
         return;
@@ -77,36 +77,42 @@ class DocumentationCLI {
         try {
           const jsdoc = generateJSDoc(element);
           const formatted = formatJSDoc(jsdoc);
-          
+
           // Validate the documentation
           const validationErrors = this.validator.validateSyntax(formatted);
           if (validationErrors.length > 0) {
             console.warn(`  Warning: Invalid JSDoc for ${element.name}`);
-            validationErrors.forEach(err => console.warn(`    - ${err.message}`));
+            validationErrors.forEach((err) =>
+              console.warn(`    - ${err.message}`),
+            );
             this.stats.warnings++;
             continue;
           }
 
           docs.push({
             element,
-          jsdoc,
-          insertionPoint: {
-            line: element.lineNumber,
-            column: 0
-          },
-          formattedComment: formatted
-        });
+            jsdoc,
+            insertionPoint: {
+              line: element.lineNumber,
+              column: 0,
+            },
+            formattedComment: formatted,
+          });
         } catch (error) {
           // Skip elements that can't be documented (e.g., no signature)
-          console.log(`  Skipping ${element.name}: ${error instanceof Error ? error.message : 'Unknown error'}`);
+          console.log(
+            `  Skipping ${element.name}: ${error instanceof Error ? error.message : "Unknown error"}`,
+          );
           continue;
         }
       }
 
       if (dryRun) {
         console.log(`  Would add ${docs.length} documentation comments`);
-        docs.forEach(doc => {
-          console.log(`    - ${doc.element.name} at line ${doc.element.lineNumber}`);
+        docs.forEach((doc) => {
+          console.log(
+            `    - ${doc.element.name} at line ${doc.element.lineNumber}`,
+          );
         });
       } else {
         this.inserter.insertDocumentation(filePath, docs);
@@ -126,11 +132,14 @@ class DocumentationCLI {
    * @param dirPath - Path to the directory
    * @param dryRun - If true, don't write changes
    */
-  async documentDirectory(dirPath: string, dryRun: boolean = false): Promise<void> {
+  async documentDirectory(
+    dirPath: string,
+    dryRun: boolean = false,
+  ): Promise<void> {
     const files = this.getSourceFiles(dirPath);
-    
+
     console.log(`Found ${files.length} files to process`);
-    
+
     for (const file of files) {
       await this.documentFile(file, dryRun);
     }
@@ -143,17 +152,23 @@ class DocumentationCLI {
    */
   private getSourceFiles(dirPath: string): string[] {
     const files: string[] = [];
-    const excludePatterns = this.config.excludePatterns || ['node_modules', 'dist', 'build'];
+    const excludePatterns = this.config.excludePatterns || [
+      "node_modules",
+      "dist",
+      "build",
+    ];
 
     const walk = (dir: string) => {
       const entries = fs.readdirSync(dir, { withFileTypes: true });
-      
+
       for (const entry of entries) {
         const fullPath = path.join(dir, entry.name);
-        
+
         // Skip excluded directories
         if (entry.isDirectory()) {
-          if (!excludePatterns.some(pattern => entry.name.includes(pattern))) {
+          if (
+            !excludePatterns.some((pattern) => entry.name.includes(pattern))
+          ) {
             walk(fullPath);
           }
         } else if (entry.isFile()) {
@@ -176,9 +191,9 @@ class DocumentationCLI {
   async validateFile(filePath: string): Promise<void> {
     try {
       console.log(`Validating ${filePath}...`);
-      
+
       const existingDocs = this.inserter.detectExistingDocs(filePath);
-      
+
       if (existingDocs.length === 0) {
         console.log(`  No documentation found`);
         return;
@@ -186,10 +201,12 @@ class DocumentationCLI {
 
       for (const doc of existingDocs) {
         const validationErrors = this.validator.validateSyntax(doc.content);
-        
+
         if (validationErrors.length > 0) {
           console.warn(`  Issues found at line ${doc.line}:`);
-          validationErrors.forEach(err => console.warn(`    - ${err.message}`));
+          validationErrors.forEach((err) =>
+            console.warn(`    - ${err.message}`),
+          );
           this.stats.warnings++;
         }
       }
@@ -205,7 +222,7 @@ class DocumentationCLI {
    * Print statistics summary
    */
   printStats(): void {
-    console.log('\n=== Summary ===');
+    console.log("\n=== Summary ===");
     console.log(`Files processed: ${this.stats.filesProcessed}`);
     console.log(`Comments added: ${this.stats.commentsAdded}`);
     console.log(`Warnings: ${this.stats.warnings}`);
@@ -220,16 +237,16 @@ class DocumentationCLI {
  */
 function loadConfig(configPath?: string): CLIConfig {
   const defaultConfig: CLIConfig = {
-    excludePatterns: ['node_modules', 'dist', 'build', '__tests__'],
+    excludePatterns: ["node_modules", "dist", "build", "__tests__"],
     style: {
       lineLength: 80,
-      indentation: '  '
-    }
+      indentation: "  ",
+    },
   };
 
   if (!configPath) {
     // Try to find .docrc.json in current directory
-    const defaultPath = path.join(process.cwd(), '.docrc.json');
+    const defaultPath = path.join(process.cwd(), ".docrc.json");
     if (fs.existsSync(defaultPath)) {
       configPath = defaultPath;
     } else {
@@ -238,11 +255,13 @@ function loadConfig(configPath?: string): CLIConfig {
   }
 
   try {
-    const content = fs.readFileSync(configPath, 'utf-8');
+    const content = fs.readFileSync(configPath, "utf-8");
     const config = JSON.parse(content);
     return { ...defaultConfig, ...config };
   } catch (error) {
-    console.warn(`Warning: Could not load config from ${configPath}, using defaults`);
+    console.warn(
+      `Warning: Could not load config from ${configPath}, using defaults`,
+    );
     return defaultConfig;
   }
 }
@@ -251,15 +270,15 @@ function loadConfig(configPath?: string): CLIConfig {
 const program = new Command();
 
 program
-  .name('doc-tool')
-  .description('Automated JSDoc documentation generator')
-  .version('1.0.0');
+  .name("doc-tool")
+  .description("Automated JSDoc documentation generator")
+  .version("1.0.0");
 
 program
-  .command('file <path>')
-  .description('Document a single file')
-  .option('--dry-run', 'Preview changes without writing')
-  .option('--config <path>', 'Path to configuration file')
+  .command("file <path>")
+  .description("Document a single file")
+  .option("--dry-run", "Preview changes without writing")
+  .option("--config <path>", "Path to configuration file")
   .action(async (filePath: string, options: any) => {
     const config = loadConfig(options.config);
     const cli = new DocumentationCLI(config);
@@ -268,10 +287,10 @@ program
   });
 
 program
-  .command('directory <path>')
-  .description('Document all files in a directory')
-  .option('--dry-run', 'Preview changes without writing')
-  .option('--config <path>', 'Path to configuration file')
+  .command("directory <path>")
+  .description("Document all files in a directory")
+  .option("--dry-run", "Preview changes without writing")
+  .option("--config <path>", "Path to configuration file")
   .action(async (dirPath: string, options: any) => {
     const config = loadConfig(options.config);
     const cli = new DocumentationCLI(config);
@@ -280,9 +299,9 @@ program
   });
 
 program
-  .command('validate <path>')
-  .description('Validate existing documentation')
-  .option('--config <path>', 'Path to configuration file')
+  .command("validate <path>")
+  .description("Validate existing documentation")
+  .option("--config <path>", "Path to configuration file")
   .action(async (filePath: string, options: any) => {
     const config = loadConfig(options.config);
     const cli = new DocumentationCLI(config);

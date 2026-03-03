@@ -6,81 +6,81 @@
  * Types of code elements that can be documented
  */
 export enum CodeElementType {
-  FUNCTION = 'function',
-  CLASS = 'class',
-  METHOD = 'method',
-  ROUTE = 'route',
-  MIDDLEWARE = 'middleware',
-  MODEL = 'model',
-  CONFIG = 'config'
+  FUNCTION = "function",
+  CLASS = "class",
+  METHOD = "method",
+  ROUTE = "route",
+  MIDDLEWARE = "middleware",
+  MODEL = "model",
+  CONFIG = "config",
 }
 
 /**
  * HTTP methods for API routes
  */
 export enum HTTPMethod {
-  GET = 'GET',
-  POST = 'POST',
-  PUT = 'PUT',
-  PATCH = 'PATCH',
-  DELETE = 'DELETE'
+  GET = "GET",
+  POST = "POST",
+  PUT = "PUT",
+  PATCH = "PATCH",
+  DELETE = "DELETE",
 }
 
 /**
  * Types of relationships between data models
  */
 export enum RelationshipType {
-  ONE_TO_ONE = 'one-to-one',
-  ONE_TO_MANY = 'one-to-many',
-  MANY_TO_MANY = 'many-to-many'
+  ONE_TO_ONE = "one-to-one",
+  ONE_TO_MANY = "one-to-many",
+  MANY_TO_MANY = "many-to-many",
 }
 
 /**
  * Types of side effects a function can have
  */
 export enum SideEffectType {
-  DATABASE = 'database',
-  API_CALL = 'api_call',
-  FILE_IO = 'file_io',
-  STATE_MUTATION = 'state_mutation'
+  DATABASE = "database",
+  API_CALL = "api_call",
+  FILE_IO = "file_io",
+  STATE_MUTATION = "state_mutation",
 }
 
 /**
  * Types of error handling patterns
  */
 export enum ErrorPatternType {
-  TRY_CATCH = 'try-catch',
-  THROW = 'throw',
-  ERROR_MIDDLEWARE = 'error-middleware',
-  ERROR_HANDLER = 'error-handler'
+  TRY_CATCH = "try-catch",
+  THROW = "throw",
+  ERROR_MIDDLEWARE = "error-middleware",
+  ERROR_HANDLER = "error-handler",
 }
 
 /**
  * Types of data models
  */
 export enum DataModelType {
-  PRISMA = 'prisma',
-  INTERFACE = 'interface',
-  TYPE = 'type',
-  CLASS = 'class'
+  PRISMA = "prisma",
+  INTERFACE = "interface",
+  TYPE = "type",
+  CLASS = "class",
 }
 
 /**
  * Types of validation errors
  */
 export enum ValidationErrorType {
-  SYNTAX = 'syntax',
-  COMPLETENESS = 'completeness',
-  CONSISTENCY = 'consistency'
+  SYNTAX = "syntax",
+  COMPLETENESS = "completeness",
+  CONSISTENCY = "consistency",
 }
 
 /**
  * Types of validation warnings
  */
 export enum ValidationWarningType {
-  REDUNDANCY = 'redundancy',
-  TERMINOLOGY = 'terminology',
-  STYLE = 'style'
+  REDUNDANCY = "redundancy",
+  TERMINOLOGY = "terminology",
+  STYLE = "style",
 }
 
 /**
@@ -299,36 +299,57 @@ export interface ValidationResult {
 /**
  * Type guard to check if a CodeElement is a function
  */
-export function isFunctionElement(element: CodeElement): element is CodeElement & { signature: FunctionSignature } {
-  return element.type === CodeElementType.FUNCTION && element.signature !== undefined;
+export function isFunctionElement(
+  element: CodeElement,
+): element is CodeElement & { signature: FunctionSignature } {
+  return (
+    element.type === CodeElementType.FUNCTION && element.signature !== undefined
+  );
 }
 
 /**
  * Type guard to check if a CodeElement is a method
  */
-export function isMethodElement(element: CodeElement): element is CodeElement & { signature: FunctionSignature } {
-  return element.type === CodeElementType.METHOD && element.signature !== undefined;
+export function isMethodElement(
+  element: CodeElement,
+): element is CodeElement & { signature: FunctionSignature } {
+  return (
+    element.type === CodeElementType.METHOD && element.signature !== undefined
+  );
 }
 
 /**
  * Type guard to check if a CodeElement is a route
  */
-export function isRouteElement(element: CodeElement): element is CodeElement & { routeInfo: RouteInfo } {
-  return element.type === CodeElementType.ROUTE && element.routeInfo !== undefined;
+export function isRouteElement(
+  element: CodeElement,
+): element is CodeElement & { routeInfo: RouteInfo } {
+  return (
+    element.type === CodeElementType.ROUTE && element.routeInfo !== undefined
+  );
 }
 
 /**
  * Type guard to check if a CodeElement is middleware
  */
-export function isMiddlewareElement(element: CodeElement): element is CodeElement & { signature: FunctionSignature } {
-  return element.type === CodeElementType.MIDDLEWARE && element.signature !== undefined;
+export function isMiddlewareElement(
+  element: CodeElement,
+): element is CodeElement & { signature: FunctionSignature } {
+  return (
+    element.type === CodeElementType.MIDDLEWARE &&
+    element.signature !== undefined
+  );
 }
 
 /**
  * Type guard to check if a CodeElement is a data model
  */
-export function isModelElement(element: CodeElement): element is CodeElement & { modelInfo: DataModel } {
-  return element.type === CodeElementType.MODEL && element.modelInfo !== undefined;
+export function isModelElement(
+  element: CodeElement,
+): element is CodeElement & { modelInfo: DataModel } {
+  return (
+    element.type === CodeElementType.MODEL && element.modelInfo !== undefined
+  );
 }
 
 /**

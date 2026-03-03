@@ -14,21 +14,25 @@ Thank you for your interest in contributing to the Documentation Tool! This guid
 ### Core Components
 
 #### CodeAnalyzer (`src/analyzers/CodeAnalyzer.ts`)
+
 - Parses JavaScript/TypeScript files using Babel
 - Extracts code elements (functions, classes, routes)
 - Returns array of `CodeElement` objects
 
 #### JSDocGenerator (`src/generators/JSDocGenerator.ts`)
+
 - Generates JSDoc comments from `CodeElement` objects
 - Creates descriptions, parameter docs, return docs
 - Exports `generateJSDoc()` and `formatJSDoc()` functions
 
 #### DocumentationValidator (`src/validators/DocumentationValidator.ts`)
+
 - Validates JSDoc syntax and completeness
 - Checks for redundancy and terminology consistency
 - Returns validation errors and warnings
 
 #### DocumentationInserter (`src/DocumentationInserter.ts`)
+
 - Inserts JSDoc comments into source files
 - Detects existing documentation to avoid conflicts
 - Preserves code structure and indentation
@@ -41,31 +45,31 @@ To add support for a new service type:
 
 ```typescript
 // src/handlers/MyServiceHandler.ts
-import { CodeElement, JSDoc } from '../types';
+import { CodeElement, JSDoc } from "../types";
 
 export function generateMyServiceDoc(element: CodeElement): JSDoc {
   // Check for service-specific patterns
   if (isMyServicePattern(element)) {
     return {
-      description: 'Service-specific description',
+      description: "Service-specific description",
       // ... other JSDoc fields
     };
   }
-  
+
   // Fall back to default generation
   return generateJSDoc(element);
 }
 
 function isMyServicePattern(element: CodeElement): boolean {
   // Detect service-specific code patterns
-  return element.context.imports?.includes('my-service-lib');
+  return element.context.imports?.includes("my-service-lib");
 }
 ```
 
 2. Export the handler from `src/handlers/index.ts`:
 
 ```typescript
-export * from './MyServiceHandler';
+export * from "./MyServiceHandler";
 ```
 
 3. Add unit tests in `__tests__/unit/service-handlers.test.ts`
@@ -79,7 +83,7 @@ To add support for new code patterns:
 ```typescript
 private extractCodeElements(ast: t.File): CodeElement[] {
   const elements: CodeElement[] = [];
-  
+
   traverse(ast, {
     // Add new visitor for your pattern
     MyPattern(path) {
@@ -90,7 +94,7 @@ private extractCodeElements(ast: t.File): CodeElement[] {
       });
     }
   });
-  
+
   return elements;
 }
 ```
@@ -109,11 +113,12 @@ private extractCodeElements(ast: t.File): CodeElement[] {
 - Place in `__tests__/unit/`
 
 Example:
+
 ```typescript
-describe('MyFeature', () => {
-  it('should handle empty input', () => {
-    const result = myFunction('');
-    expect(result).toBe('default');
+describe("MyFeature", () => {
+  it("should handle empty input", () => {
+    const result = myFunction("");
+    expect(result).toBe("default");
   });
 });
 ```
@@ -126,20 +131,18 @@ describe('MyFeature', () => {
 - Place in `__tests__/property/`
 
 Example:
-```typescript
-import * as fc from 'fast-check';
 
-describe('Property X: Description', () => {
-  it('should maintain property across all inputs', () => {
+```typescript
+import * as fc from "fast-check";
+
+describe("Property X: Description", () => {
+  it("should maintain property across all inputs", () => {
     fc.assert(
-      fc.property(
-        fc.string(),
-        (input) => {
-          const result = myFunction(input);
-          expect(result).toBeTruthy();
-        }
-      ),
-      { numRuns: 100 }
+      fc.property(fc.string(), (input) => {
+        const result = myFunction(input);
+        expect(result).toBeTruthy();
+      }),
+      { numRuns: 100 },
     );
   });
 });
@@ -148,6 +151,7 @@ describe('Property X: Description', () => {
 ### Test Coverage
 
 Maintain minimum coverage:
+
 - Line coverage: 80%
 - Branch coverage: 75%
 - Function coverage: 90%
