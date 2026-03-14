@@ -69,7 +69,7 @@ export class CodeAnalyzer {
    */
   private parseFile(content: string, extension: string): any {
     const isTypeScript = extension === ".ts" || extension === ".tsx";
-    const isJSX = extension === ".jsx" || extension === ".tsx";
+    const isJSX = extension === ".jsx" || extension === ".tsx" || extension === ".js";
 
     const plugins: parser.ParserPlugin[] = [];
 
