@@ -31,11 +31,11 @@ describe("Property 4: Edge Case Documentation", () => {
 
   // Generator for functions with edge case handling
   const functionWithEdgeCasesArb = fc.record({
-    name: fc.stringOf(fc.constantFrom("a", "b", "c", "d", "e"), {
+    name: fc.string({
       minLength: 5,
       maxLength: 15,
     }),
-    paramName: fc.stringOf(fc.constantFrom("a", "b", "c", "d", "e"), {
+    paramName: fc.string({
       minLength: 3,
       maxLength: 10,
     }),

@@ -19,7 +19,7 @@ import {
 describe("Property 3: Parameter Constraint Documentation", () => {
   // Generator for parameters with constraints
   const constrainedParameterArb = fc.record({
-    name: fc.stringOf(fc.constantFrom("a", "b", "c", "d", "e"), {
+    name: fc.string({
       minLength: 3,
       maxLength: 10,
     }),
@@ -45,7 +45,7 @@ describe("Property 3: Parameter Constraint Documentation", () => {
 
   // Generator for function signatures with constrained parameters
   const functionWithConstraintsArb = fc.record({
-    name: fc.stringOf(fc.constantFrom("a", "b", "c", "d", "e"), {
+    name: fc.string({
       minLength: 5,
       maxLength: 15,
     }),

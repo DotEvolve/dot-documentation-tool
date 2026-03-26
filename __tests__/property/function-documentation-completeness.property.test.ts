@@ -315,7 +315,7 @@ describe("Property 1: Function Documentation Completeness", () => {
           context: fc.constant({}),
         }),
         (element) => {
-          const jsdoc = generateJSDoc(element);
+          const jsdoc = generateJSDoc(element as any);
 
           // Even minimal functions must have a description
           expect(jsdoc.description).toBeDefined();
@@ -362,7 +362,7 @@ describe("Property 1: Function Documentation Completeness", () => {
           context: fc.constant({}),
         }),
         (element) => {
-          const jsdoc = generateJSDoc(element);
+          const jsdoc = generateJSDoc(element as any);
 
           // All optional parameters must be documented with optional flag
           expect(jsdoc.params).toBeDefined();
@@ -399,7 +399,7 @@ describe("Property 1: Function Documentation Completeness", () => {
           context: fc.constant({}),
         }),
         (element) => {
-          const jsdoc = generateJSDoc(element);
+          const jsdoc = generateJSDoc(element as any);
 
           // Async functions with non-void Promise should have @returns
           if (element.signature!.returnType !== "Promise<void>") {

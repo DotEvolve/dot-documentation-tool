@@ -112,7 +112,7 @@ describe("Property 18: Documentation-Code Synchronization", () => {
     fc.assert(
       fc.property(functionSignatureArbitrary, (signature) => {
         // Generate JSDoc from the function signature
-        const jsdoc = generateJSDocFromSignature(signature);
+        const jsdoc = generateJSDocFromSignature(signature as any);
 
         // Property: If signature has parameters, JSDoc should document them in the same order
         if (signature.parameters.length > 0) {
@@ -137,7 +137,7 @@ describe("Property 18: Documentation-Code Synchronization", () => {
   it("should maintain parameter type consistency between signature and JSDoc", () => {
     fc.assert(
       fc.property(functionSignatureArbitrary, (signature) => {
-        const jsdoc = generateJSDocFromSignature(signature);
+        const jsdoc = generateJSDocFromSignature(signature as any);
 
         // Property: Parameter types in JSDoc should match signature types
         if (signature.parameters.length > 0 && jsdoc.params) {
@@ -156,7 +156,7 @@ describe("Property 18: Documentation-Code Synchronization", () => {
   it("should maintain optional flag consistency between signature and JSDoc", () => {
     fc.assert(
       fc.property(functionSignatureArbitrary, (signature) => {
-        const jsdoc = generateJSDocFromSignature(signature);
+        const jsdoc = generateJSDocFromSignature(signature as any);
 
         // Property: Optional flags in JSDoc should match signature optional flags
         if (signature.parameters.length > 0 && jsdoc.params) {
@@ -174,7 +174,7 @@ describe("Property 18: Documentation-Code Synchronization", () => {
   it("should maintain return type consistency between signature and JSDoc", () => {
     fc.assert(
       fc.property(functionSignatureArbitrary, (signature) => {
-        const jsdoc = generateJSDocFromSignature(signature);
+        const jsdoc = generateJSDocFromSignature(signature as any);
 
         // Property: Return type in JSDoc should match signature return type
         if (signature.returnType && signature.returnType !== "void") {
@@ -194,7 +194,7 @@ describe("Property 18: Documentation-Code Synchronization", () => {
   it("should maintain throws consistency between signature and JSDoc", () => {
     fc.assert(
       fc.property(functionSignatureArbitrary, (signature) => {
-        const jsdoc = generateJSDocFromSignature(signature);
+        const jsdoc = generateJSDocFromSignature(signature as any);
 
         // Property: Throws in JSDoc should match signature throws
         if (signature.throws && signature.throws.length > 0) {
@@ -218,7 +218,7 @@ describe("Property 18: Documentation-Code Synchronization", () => {
   it("should maintain default value consistency between signature and JSDoc", () => {
     fc.assert(
       fc.property(functionSignatureArbitrary, (signature) => {
-        const jsdoc = generateJSDocFromSignature(signature);
+        const jsdoc = generateJSDocFromSignature(signature as any);
 
         // Property: Default values in JSDoc should match signature default values
         if (signature.parameters.length > 0 && jsdoc.params) {
