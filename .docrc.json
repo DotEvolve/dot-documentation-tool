@@ -1,0 +1,19 @@
+{
+  "glossary": {
+    "customer": "Tenant",
+    "workflow": "Workflow Instance",
+    "user": "Tenant",
+    "record": "Entity"
+  },
+  "exclude": [
+    "**/*.test.js",
+    "**/*.test.ts",
+    "**/*.spec.js",
+    "**/*.spec.ts",
+    "**/node_modules/**",
+    "**/dist/**",
+    "**/build/**",
+    "**/__tests__/**",
+    "**/__mocks__/**"
+  ]
+}
