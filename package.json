@@ -19,6 +19,9 @@
   ],
   "author": "",
   "license": "MIT",
+  "engines": {
+    "node": "24.x"
+  },
   "devDependencies": {
     "@types/babel__traverse": "^7.20.5",
     "@types/jest": "^29.5.11",
