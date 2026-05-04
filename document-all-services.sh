@@ -1,6 +1,6 @@
 #!/bin/bash
 
-# Script to document all DotEvolve services (dot-cOS + Foot Factory + Central Portal)
+# Script to document all DotEvolve services (Govnix + Floorix + Central Portal)
 
 echo "========================================="
 echo "Documenting All DotEvolve Services"
@@ -33,19 +33,19 @@ document_service "Portal API" "$WORKSPACE_ROOT/../dot-portal-api/src"
 document_service "Admin Portal" "$WORKSPACE_ROOT/../dot-admin/src"
 document_service "End-User Portal" "$WORKSPACE_ROOT/../dot-portal/src"
 
-# ── dot-cOS ───────────────────────────────────────────────────────────────────
-echo "--- dot-cOS ---"
-document_service "API Gateway" "$WORKSPACE_ROOT/../dot-cos-api-gateway/api"
-document_service "Workflow Service" "$WORKSPACE_ROOT/../dot-cos-workflow-service/src"
-document_service "Rule Engine Service" "$WORKSPACE_ROOT/../dot-cos-rule-engine-service/src"
-document_service "Frontend" "$WORKSPACE_ROOT/../dot-cos-frontend/src"
-document_service "Admin Dashboard" "$WORKSPACE_ROOT/../dot-cos-admin-dashboard/src"
+# ── Govnix ───────────────────────────────────────────────────────────────────
+echo "--- Govnix ---"
+document_service "API Gateway" "$WORKSPACE_ROOT/../govnix-api-gateway/api"
+document_service "Workflow Service" "$WORKSPACE_ROOT/../govnix-workflow-service/src"
+document_service "Rule Engine Service" "$WORKSPACE_ROOT/../govnix-rule-engine-service/src"
+document_service "Frontend" "$WORKSPACE_ROOT/../govnix-app/src"
+document_service "Admin Dashboard" "$WORKSPACE_ROOT/../govnix-admin/src"
 
-# ── Foot Factory ──────────────────────────────────────────────────────────────
-echo "--- Foot Factory ---"
-document_service "Foot Factory API" "$WORKSPACE_ROOT/../dot-foot-factory-api"
-document_service "Foot Factory Client" "$WORKSPACE_ROOT/../dot-foot-factory-client/src"
-document_service "Foot Factory Admin" "$WORKSPACE_ROOT/../dot-foot-factory-admin/src"
+# ── Floorix ──────────────────────────────────────────────────────────────
+echo "--- Floorix ---"
+document_service "Floorix API" "$WORKSPACE_ROOT/../floorix-api"
+document_service "Floorix Client" "$WORKSPACE_ROOT/../floorix-app/src"
+document_service "Floorix Admin" "$WORKSPACE_ROOT/../floorix-admin/src"
 
 # ── Shared ────────────────────────────────────────────────────────────────────
 echo "--- Shared ---"

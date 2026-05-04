@@ -1,6 +1,6 @@
 # DotEvolve Documentation Tool
 
-Automated JSDoc documentation generator for DotEvolve projects and dot-cOS services.
+Automated JSDoc documentation generator for DotEvolve projects and Govnix services.
 
 ## Overview
 
