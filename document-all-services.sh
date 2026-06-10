@@ -35,7 +35,7 @@ document_service "End-User Portal" "$WORKSPACE_ROOT/../dot-portal/src"
 
 # ── Govnix ───────────────────────────────────────────────────────────────────
 echo "--- Govnix ---"
-document_service "API Gateway" "$WORKSPACE_ROOT/../govnix-api-gateway/api"
+document_service "API Gateway" "$WORKSPACE_ROOT/../govnix-api/api"
 document_service "Workflow Service" "$WORKSPACE_ROOT/../govnix-workflow-service/src"
 document_service "Rule Engine Service" "$WORKSPACE_ROOT/../govnix-rule-engine-service/src"
 document_service "Frontend" "$WORKSPACE_ROOT/../govnix-app/src"
