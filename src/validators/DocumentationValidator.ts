@@ -34,10 +34,7 @@ export interface TerminologyIssue {
  */
 export interface ValidationIssue {
   type:
-    | "missing_param"
-    | "missing_return"
-    | "missing_throws"
-    | "param_mismatch";
+    "missing_param" | "missing_return" | "missing_throws" | "param_mismatch";
   message: string;
   paramName?: string;
 }
