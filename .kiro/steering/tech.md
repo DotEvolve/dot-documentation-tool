@@ -6,20 +6,20 @@ inclusion: always
 
 ## Core
 
-| Concern | Library | Version |
-|---|---|---|
-| Runtime | Node.js | 24.x |
-| Language | TypeScript | 5.3.x |
-| CLI Framework | commander | — |
-| AST Parsing | @babel/parser, @babel/traverse, @babel/types | — |
+| Concern       | Library                                      | Version |
+| ------------- | -------------------------------------------- | ------- |
+| Runtime       | Node.js                                      | 24.x    |
+| Language      | TypeScript                                   | 5.3.x   |
+| CLI Framework | commander                                    | —       |
+| AST Parsing   | @babel/parser, @babel/traverse, @babel/types | —       |
 
 ## Testing
 
-| Concern | Library | Version |
-|---|---|---|
-| Runner | Jest | 29.x |
-| TypeScript integration | ts-jest | — |
-| Property-Based | fast-check | — |
+| Concern                | Library    | Version |
+| ---------------------- | ---------- | ------- |
+| Runner                 | Jest       | 29.x    |
+| TypeScript integration | ts-jest    | —       |
+| Property-Based         | fast-check | —       |
 
 - Unit tests live in `__tests__/unit/`, property tests in `__tests__/property/`, integration tests in `__tests__/integration/`.
 - Property tests are named `*.property.test.ts` and must run a **minimum of 100 iterations** per property.

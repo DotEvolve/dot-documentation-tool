@@ -10,11 +10,11 @@ A Node.js CLI tool that performs static AST analysis on JavaScript and TypeScrip
 
 The tool is invoked via the `doc-tool` binary (entry point: `src/cli.ts`). Three commands are available:
 
-| Command | Description |
-|---|---|
-| `doc-tool file <path>` | Generate JSDoc for a single file |
+| Command                     | Description                                                         |
+| --------------------------- | ------------------------------------------------------------------- |
+| `doc-tool file <path>`      | Generate JSDoc for a single file                                    |
 | `doc-tool directory <path>` | Recursively generate JSDoc for all `.ts`/`.js` files in a directory |
-| `doc-tool validate <path>` | Validate syntax and completeness of existing JSDoc in a file |
+| `doc-tool validate <path>`  | Validate syntax and completeness of existing JSDoc in a file        |
 
 All commands accept `--dry-run` (preview without writing) and `--config <path>` (custom `.docrc.json` path).
 
