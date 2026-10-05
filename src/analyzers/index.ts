@@ -6,5 +6,8 @@
  */
 
 export { CodeAnalyzer } from "./CodeAnalyzer.js";
-export { detectSideEffects, detectErrorHandling } from "./SideEffectDetector.js";
+export {
+  detectSideEffects,
+  detectErrorHandling,
+} from "./SideEffectDetector.js";
 export { DataModelAnalyzer } from "./DataModelAnalyzer.js";
