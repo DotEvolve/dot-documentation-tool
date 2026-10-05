@@ -1,5 +1,5 @@
 import * as fs from "fs";
-import { Documentation } from "./types";
+import { Documentation } from "./types.js";
 
 /**
  * Represents existing documentation found in a file

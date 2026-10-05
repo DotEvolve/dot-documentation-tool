@@ -11,7 +11,7 @@ import {
   ValidationWarning,
   ValidationErrorType,
   ValidationWarningType,
-} from "../types";
+} from "../types.js";
 
 /**
  * Glossary of standard terminology

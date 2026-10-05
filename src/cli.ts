@@ -3,11 +3,11 @@
 import * as fs from "fs";
 import * as path from "path";
 import { Command } from "commander";
-import { CodeAnalyzer } from "./analyzers/CodeAnalyzer";
-import { generateJSDoc, formatJSDoc } from "./generators/JSDocGenerator";
-import { DocumentationValidator } from "./validators/DocumentationValidator";
-import { DocumentationInserter } from "./DocumentationInserter";
-import { Documentation } from "./types";
+import { CodeAnalyzer } from "./analyzers/CodeAnalyzer.js";
+import { generateJSDoc, formatJSDoc } from "./generators/JSDocGenerator.js";
+import { DocumentationValidator } from "./validators/DocumentationValidator.js";
+import { DocumentationInserter } from "./DocumentationInserter.js";
+import { Documentation } from "./types.js";
 
 /**
  * CLI configuration options

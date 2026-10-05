@@ -13,7 +13,7 @@ import {
   SideEffectType,
   ErrorPattern,
   ErrorPatternType,
-} from "../types";
+} from "../types.js";
 
 /**
  * Detects side effects in a function's AST node

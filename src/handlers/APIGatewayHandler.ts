@@ -5,7 +5,7 @@
  * Handles authentication middleware, proxy routing, CORS, and security headers.
  */
 
-import { CodeElement, JSDoc, ParamDoc, ThrowsDoc } from "../types";
+import { CodeElement, JSDoc, ParamDoc, ThrowsDoc } from "../types.js";
 
 /**
  * Generates specialized documentation for API Gateway components

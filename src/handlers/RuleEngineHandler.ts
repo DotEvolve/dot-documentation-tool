@@ -5,7 +5,7 @@
  * Handles RabbitMQ integration, webhook payload validation, message queue patterns, and retry logic.
  */
 
-import { CodeElement, JSDoc, ParamDoc, ThrowsDoc } from "../types";
+import { CodeElement, JSDoc, ParamDoc, ThrowsDoc } from "../types.js";
 
 /**
  * Generates specialized documentation for Rule Engine Service components

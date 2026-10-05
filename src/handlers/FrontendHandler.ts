@@ -5,7 +5,7 @@
  * Handles React components, hooks, state management, API clients, and routing.
  */
 
-import { CodeElement, JSDoc, ParamDoc } from "../types";
+import { CodeElement, JSDoc, ParamDoc } from "../types.js";
 
 /**
  * Generates specialized documentation for Frontend components

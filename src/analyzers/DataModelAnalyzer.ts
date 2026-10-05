@@ -14,7 +14,7 @@ import {
   Relationship,
   RelationshipType,
   Validation,
-} from "../types";
+} from "../types.js";
 
 /**
  * Analyzer for extracting data model information from AST nodes
