@@ -5,6 +5,9 @@
  * identifying patterns, and understanding code context for documentation generation.
  */
 
-export { CodeAnalyzer } from "./CodeAnalyzer";
-export { detectSideEffects, detectErrorHandling } from "./SideEffectDetector";
-export { DataModelAnalyzer } from "./DataModelAnalyzer";
+export { CodeAnalyzer } from "./CodeAnalyzer.js";
+export {
+  detectSideEffects,
+  detectErrorHandling,
+} from "./SideEffectDetector.js";
+export { DataModelAnalyzer } from "./DataModelAnalyzer.js";

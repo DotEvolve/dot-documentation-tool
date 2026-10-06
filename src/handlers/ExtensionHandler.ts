@@ -5,7 +5,7 @@
  * Handles Chrome APIs, content scripts, message passing, and authentication sync.
  */
 
-import { CodeElement, JSDoc, ParamDoc } from "../types";
+import { CodeElement, JSDoc, ParamDoc } from "../types.js";
 
 /**
  * Generates specialized documentation for Chrome Extension components

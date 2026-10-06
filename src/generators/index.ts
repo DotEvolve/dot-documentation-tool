@@ -5,11 +5,11 @@
  * Handles different code patterns and ensures consistent documentation format.
  */
 
-export { generateJSDoc, formatJSDoc } from "./JSDocGenerator";
-export { generateRouteDoc } from "./RouteDocGenerator";
+export { generateJSDoc, formatJSDoc } from "./JSDocGenerator.js";
+export { generateRouteDoc } from "./RouteDocGenerator.js";
 export {
   generateInlineComments,
   detectBusinessRules,
   InlineComment,
   BusinessRule,
-} from "./InlineCommentGenerator";
+} from "./InlineCommentGenerator.js";

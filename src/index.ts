@@ -1,12 +1,11 @@
 /**
- * Documentation Tool - Main Entry Point
+ * Documentation Tool Entry Point
  *
- * Automated JSDoc documentation generator for Govnix services.
- * This tool analyzes JavaScript/TypeScript code and generates comprehensive
- * JSDoc comments following the project's documentation standards.
+ * Automated JSDoc documentation generator for Node.js projects.
+ * This file serves as the main entry point for the library and CLI.
  */
 
-export * from "./analyzers";
-export * from "./generators";
-export * from "./validators";
-export * from "./handlers";
+export * from "./analyzers/index.js";
+export * from "./generators/index.js";
+export * from "./validators/index.js";
+export * from "./handlers/index.js";

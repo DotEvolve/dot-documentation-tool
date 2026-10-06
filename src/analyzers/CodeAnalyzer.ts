@@ -16,7 +16,7 @@ import {
   Parameter,
   RouteInfo,
   HTTPMethod,
-} from "../types";
+} from "../types.js";
 
 /**
  * Main code analyzer class for parsing source files
