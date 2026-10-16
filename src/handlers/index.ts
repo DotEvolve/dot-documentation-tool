@@ -5,8 +5,8 @@
  * (API Gateway, Workflow Service, Rule Engine, Frontend, Extension).
  */
 
-export { generateAPIGatewayDoc } from "./APIGatewayHandler";
-export { generateWorkflowServiceDoc } from "./WorkflowServiceHandler";
-export { generateRuleEngineDoc } from "./RuleEngineHandler";
-export { generateFrontendDoc } from "./FrontendHandler";
-export { generateExtensionDoc } from "./ExtensionHandler";
+export { generateAPIGatewayDoc } from "./APIGatewayHandler.js";
+export { generateWorkflowServiceDoc } from "./WorkflowServiceHandler.js";
+export { generateRuleEngineDoc } from "./RuleEngineHandler.js";
+export { generateFrontendDoc } from "./FrontendHandler.js";
+export { generateExtensionDoc } from "./ExtensionHandler.js";

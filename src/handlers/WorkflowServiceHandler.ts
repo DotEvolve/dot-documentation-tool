@@ -5,7 +5,7 @@
  * Handles Prisma models, business logic, compliance rules, PDF generation, and audit logging.
  */
 
-import { CodeElement, JSDoc, ParamDoc, ThrowsDoc } from "../types";
+import { CodeElement, JSDoc, ParamDoc, ThrowsDoc } from "../types.js";
 
 /**
  * Generates specialized documentation for Workflow Service components

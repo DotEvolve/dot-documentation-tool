@@ -5,7 +5,7 @@
  * Documents endpoints, parameters, responses, authentication, and side effects.
  */
 
-import { RouteInfo, JSDoc, ParamDoc, ThrowsDoc, HTTPMethod } from "../types";
+import { RouteInfo, JSDoc, ParamDoc, ThrowsDoc, HTTPMethod } from "../types.js";
 
 /**
  * Generates JSDoc documentation for an API route handler

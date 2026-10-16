@@ -1,10 +1,10 @@
 # DotEvolve Documentation Tool
 
-Automated JSDoc documentation generator for DotEvolve projects and Govnix services.
+Automated JSDoc documentation generator for Node.js and TypeScript projects.
 
 ## Overview
 
-This tool analyzes JavaScript/TypeScript code and generates comprehensive JSDoc comments following the project's documentation standards. It supports multiple service types including API Gateway, Workflow Service, Rule Engine, Frontend applications, and Chrome extensions.
+This tool analyzes JavaScript/TypeScript code and generates comprehensive JSDoc comments following modern documentation standards. It supports multiple service architectures including API Gateways, Microservices, Frontend applications, and Browser extensions.
 
 ## Features
 
@@ -166,11 +166,11 @@ Inserts generated JSDoc comments into source files while:
 
 Specialized documentation for:
 
-- **API Gateway**: Authentication middleware, proxy routing
-- **Workflow Service**: Prisma models, business logic
-- **Rule Engine**: RabbitMQ integration, webhooks
+- **API Services**: Authentication middleware, proxy routing
+- **Database Services**: Prisma models, business logic
+- **Event-Driven Services**: RabbitMQ integration, webhooks
 - **Frontend**: React components, hooks, routing
-- **Extension**: Chrome APIs, message passing
+- **Browser Extensions**: Chrome APIs, message passing
 
 ## Testing Strategy
 

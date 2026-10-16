@@ -6,7 +6,13 @@
  * documents return values, and documents errors that can be thrown.
  */
 
-import { CodeElement, JSDoc, ParamDoc, ReturnDoc, ThrowsDoc } from "../types";
+import {
+  CodeElement,
+  JSDoc,
+  ParamDoc,
+  ReturnDoc,
+  ThrowsDoc,
+} from "../types.js";
 
 /**
  * Generates a JSDoc comment for a code element
