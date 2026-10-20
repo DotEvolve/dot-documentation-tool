@@ -6,13 +6,7 @@
  * documents return values, and documents errors that can be thrown.
  */
 
-import {
-  CodeElement,
-  JSDoc,
-  ParamDoc,
-  ReturnDoc,
-  ThrowsDoc,
-} from "../types.js";
+import { CodeElement, JSDoc, ParamDoc, ReturnDoc, ThrowsDoc } from '../types.js';
 
 /**
  * Generates a JSDoc comment for a code element
@@ -23,9 +17,7 @@ import {
  */
 export function generateJSDoc(element: CodeElement): JSDoc {
   if (!element.signature) {
-    throw new Error(
-      `Cannot generate JSDoc for element without signature: ${element.name}`,
-    );
+    throw new Error(`Cannot generate JSDoc for element without signature: ${element.name}`);
   }
 
   const description = generateDescription(element);
@@ -52,56 +44,52 @@ function generateDescription(element: CodeElement): string {
 
   // Convert camelCase or PascalCase to words
   const words = name
-    .replace(/([A-Z])/g, " $1")
+    .replace(/([A-Z])/g, ' $1')
     .replace(/^./, (str) => str.toUpperCase())
     .trim();
 
   // Detect common patterns
-  if (name.startsWith("get")) {
-    const target = words.replace(/^Get\s+/, "");
+  if (name.startsWith('get')) {
+    const target = words.replace(/^Get\s+/, '');
     return `Retrieves ${target.toLowerCase()}`;
   }
 
-  if (name.startsWith("set")) {
-    const target = words.replace(/^Set\s+/, "");
+  if (name.startsWith('set')) {
+    const target = words.replace(/^Set\s+/, '');
     return `Sets ${target.toLowerCase()}`;
   }
 
-  if (name.startsWith("create")) {
-    const target = words.replace(/^Create\s+/, "");
+  if (name.startsWith('create')) {
+    const target = words.replace(/^Create\s+/, '');
     return `Creates a new ${target.toLowerCase()}`;
   }
 
-  if (name.startsWith("update")) {
-    const target = words.replace(/^Update\s+/, "");
+  if (name.startsWith('update')) {
+    const target = words.replace(/^Update\s+/, '');
     return `Updates ${target.toLowerCase()}`;
   }
 
-  if (name.startsWith("delete") || name.startsWith("remove")) {
-    const target = words.replace(/^(Delete|Remove)\s+/, "");
+  if (name.startsWith('delete') || name.startsWith('remove')) {
+    const target = words.replace(/^(Delete|Remove)\s+/, '');
     return `Deletes ${target.toLowerCase()}`;
   }
 
-  if (name.startsWith("find") || name.startsWith("search")) {
-    const target = words.replace(/^(Find|Search)\s+/, "");
+  if (name.startsWith('find') || name.startsWith('search')) {
+    const target = words.replace(/^(Find|Search)\s+/, '');
     return `Finds ${target.toLowerCase()}`;
   }
 
-  if (name.startsWith("validate")) {
-    const target = words.replace(/^Validate\s+/, "");
+  if (name.startsWith('validate')) {
+    const target = words.replace(/^Validate\s+/, '');
     return `Validates ${target.toLowerCase()}`;
   }
 
-  if (name.startsWith("calculate") || name.startsWith("compute")) {
-    const target = words.replace(/^(Calculate|Compute)\s+/, "");
+  if (name.startsWith('calculate') || name.startsWith('compute')) {
+    const target = words.replace(/^(Calculate|Compute)\s+/, '');
     return `Calculates ${target.toLowerCase()}`;
   }
 
-  if (
-    name.startsWith("is") ||
-    name.startsWith("has") ||
-    name.startsWith("can")
-  ) {
+  if (name.startsWith('is') || name.startsWith('has') || name.startsWith('can')) {
     return `Checks if ${words.toLowerCase()}`;
   }
 
@@ -128,7 +116,7 @@ function generateParamDocs(element: CodeElement): ParamDoc[] {
   return element.signature.parameters.map((param) => {
     const paramDoc: ParamDoc = {
       name: param.name,
-      type: param.type || "*",
+      type: param.type || '*',
       description: generateParamDescription(param.name, param.type),
       optional: param.optional,
     };
@@ -151,63 +139,63 @@ function generateParamDocs(element: CodeElement): ParamDoc[] {
 function generateParamDescription(name: string, type?: string): string {
   // Convert camelCase to words
   const words = name
-    .replace(/([A-Z])/g, " $1")
+    .replace(/([A-Z])/g, ' $1')
     .toLowerCase()
     .trim();
 
   // Common parameter patterns
-  if (name === "id") {
-    return "The unique identifier";
+  if (name === 'id') {
+    return 'The unique identifier';
   }
 
-  if (name.endsWith("Id")) {
-    const entity = name.replace(/Id$/, "");
+  if (name.endsWith('Id')) {
+    const entity = name.replace(/Id$/, '');
     const entityWords = entity
-      .replace(/([A-Z])/g, " $1")
+      .replace(/([A-Z])/g, ' $1')
       .toLowerCase()
       .trim();
     return `The ${entityWords} identifier`;
   }
 
-  if (name === "data" || name === "payload") {
-    return "The data to process";
+  if (name === 'data' || name === 'payload') {
+    return 'The data to process';
   }
 
-  if (name === "options" || name === "config") {
-    return "Configuration options";
+  if (name === 'options' || name === 'config') {
+    return 'Configuration options';
   }
 
-  if (name === "callback" || name === "cb") {
-    return "Callback function";
+  if (name === 'callback' || name === 'cb') {
+    return 'Callback function';
   }
 
-  if (name === "error" || name === "err") {
-    return "Error object";
+  if (name === 'error' || name === 'err') {
+    return 'Error object';
   }
 
-  if (name === "req" || name === "request") {
-    return "HTTP request object";
+  if (name === 'req' || name === 'request') {
+    return 'HTTP request object';
   }
 
-  if (name === "res" || name === "response") {
-    return "HTTP response object";
+  if (name === 'res' || name === 'response') {
+    return 'HTTP response object';
   }
 
-  if (name === "next") {
-    return "Next middleware function";
+  if (name === 'next') {
+    return 'Next middleware function';
   }
 
   // Type-based descriptions
   if (type) {
-    if (type.includes("[]") || type.toLowerCase().includes("array")) {
+    if (type.includes('[]') || type.toLowerCase().includes('array')) {
       return `Array of ${words}`;
     }
 
-    if (type.toLowerCase() === "boolean") {
+    if (type.toLowerCase() === 'boolean') {
       return `Whether ${words}`;
     }
 
-    if (type.toLowerCase().includes("function")) {
+    if (type.toLowerCase().includes('function')) {
       return `Function to ${words}`;
     }
   }
@@ -226,13 +214,13 @@ function generateReturnDoc(element: CodeElement): ReturnDoc | undefined {
   const returnType = element.signature?.returnType;
 
   // Don't document void returns
-  if (!returnType || returnType === "void") {
+  if (!returnType || returnType === 'void') {
     return undefined;
   }
 
   // Handle Promise types
-  if (returnType.startsWith("Promise<")) {
-    const innerType = returnType.match(/Promise<(.+)>/)?.[1] || "*";
+  if (returnType.startsWith('Promise<')) {
+    const innerType = returnType.match(/Promise<(.+)>/)?.[1] || '*';
     return {
       type: returnType,
       description: `Promise that resolves to ${generateReturnDescription(innerType, element.name)}`,
@@ -252,52 +240,44 @@ function generateReturnDoc(element: CodeElement): ReturnDoc | undefined {
  * @param {string} functionName - The function name for context
  * @returns {string} A description of the return value
  */
-function generateReturnDescription(
-  returnType: string,
-  functionName: string,
-): string {
+function generateReturnDescription(returnType: string, functionName: string): string {
   // Handle array types
-  if (returnType.includes("[]") || returnType.toLowerCase().includes("array")) {
-    const elementType = returnType
-      .replace(/\[\]$/, "")
-      .replace(/Array<(.+)>/, "$1");
+  if (returnType.includes('[]') || returnType.toLowerCase().includes('array')) {
+    const elementType = returnType.replace(/\[\]$/, '').replace(/Array<(.+)>/, '$1');
     return `Array of ${elementType} objects`;
   }
 
   // Handle boolean returns
-  if (returnType.toLowerCase() === "boolean") {
+  if (returnType.toLowerCase() === 'boolean') {
     if (
-      functionName.startsWith("is") ||
-      functionName.startsWith("has") ||
-      functionName.startsWith("can")
+      functionName.startsWith('is') ||
+      functionName.startsWith('has') ||
+      functionName.startsWith('can')
     ) {
-      return "True if condition is met, false otherwise";
+      return 'True if condition is met, false otherwise';
     }
-    return "Boolean indicating success or failure";
+    return 'Boolean indicating success or failure';
   }
 
   // Handle number returns
-  if (returnType.toLowerCase() === "number") {
-    if (functionName.includes("count") || functionName.includes("Count")) {
-      return "The count of items";
+  if (returnType.toLowerCase() === 'number') {
+    if (functionName.includes('count') || functionName.includes('Count')) {
+      return 'The count of items';
     }
-    if (
-      functionName.includes("calculate") ||
-      functionName.includes("compute")
-    ) {
-      return "The calculated value";
+    if (functionName.includes('calculate') || functionName.includes('compute')) {
+      return 'The calculated value';
     }
-    return "Numeric result";
+    return 'Numeric result';
   }
 
   // Handle string returns
-  if (returnType.toLowerCase() === "string") {
-    return "String result";
+  if (returnType.toLowerCase() === 'string') {
+    return 'String result';
   }
 
   // Handle object returns
-  if (returnType === "object" || returnType.startsWith("{")) {
-    return "Object containing the result";
+  if (returnType === 'object' || returnType.startsWith('{')) {
+    return 'Object containing the result';
   }
 
   // Default description with type
@@ -326,20 +306,20 @@ function generateThrowsDocs(element: CodeElement): ThrowsDoc[] {
 
   // Document potential errors from side effects
   for (const effect of sideEffects) {
-    if (effect.type === "database") {
+    if (effect.type === 'database') {
       throwsDocs.push({
-        type: "Error",
-        condition: "If database operation fails",
+        type: 'Error',
+        condition: 'If database operation fails',
       });
-    } else if (effect.type === "api_call") {
+    } else if (effect.type === 'api_call') {
       throwsDocs.push({
-        type: "Error",
-        condition: "If external API call fails",
+        type: 'Error',
+        condition: 'If external API call fails',
       });
-    } else if (effect.type === "file_io") {
+    } else if (effect.type === 'file_io') {
       throwsDocs.push({
-        type: "Error",
-        condition: "If file operation fails",
+        type: 'Error',
+        condition: 'If file operation fails',
       });
     }
   }
@@ -347,10 +327,7 @@ function generateThrowsDocs(element: CodeElement): ThrowsDoc[] {
   // Remove duplicates
   const uniqueThrows = throwsDocs.filter(
     (doc, index, self) =>
-      index ===
-      self.findIndex(
-        (t) => t.type === doc.type && t.condition === doc.condition,
-      ),
+      index === self.findIndex((t) => t.type === doc.type && t.condition === doc.condition)
   );
 
   return uniqueThrows;
@@ -365,36 +342,36 @@ function generateThrowsDocs(element: CodeElement): ThrowsDoc[] {
 function generateThrowsCondition(errorType: string): string {
   const lowerType = errorType.toLowerCase();
 
-  if (lowerType.includes("validation")) {
-    return "If input validation fails";
+  if (lowerType.includes('validation')) {
+    return 'If input validation fails';
   }
 
-  if (lowerType.includes("notfound") || lowerType.includes("not_found")) {
-    return "If the requested resource is not found";
+  if (lowerType.includes('notfound') || lowerType.includes('not_found')) {
+    return 'If the requested resource is not found';
   }
 
-  if (lowerType.includes("unauthorized") || lowerType.includes("auth")) {
-    return "If authentication or authorization fails";
+  if (lowerType.includes('unauthorized') || lowerType.includes('auth')) {
+    return 'If authentication or authorization fails';
   }
 
-  if (lowerType.includes("forbidden")) {
-    return "If access is forbidden";
+  if (lowerType.includes('forbidden')) {
+    return 'If access is forbidden';
   }
 
-  if (lowerType.includes("conflict")) {
-    return "If a conflict occurs";
+  if (lowerType.includes('conflict')) {
+    return 'If a conflict occurs';
   }
 
-  if (lowerType.includes("badrequest") || lowerType.includes("bad_request")) {
-    return "If the request is invalid";
+  if (lowerType.includes('badrequest') || lowerType.includes('bad_request')) {
+    return 'If the request is invalid';
   }
 
-  if (lowerType.includes("timeout")) {
-    return "If the operation times out";
+  if (lowerType.includes('timeout')) {
+    return 'If the operation times out';
   }
 
   // Default condition
-  return "If an error occurs during execution";
+  return 'If an error occurs during execution';
 }
 
 /**
@@ -407,51 +384,40 @@ export function formatJSDoc(jsdoc: JSDoc): string {
   const lines: string[] = [];
 
   // Opening comment
-  lines.push("/**");
+  lines.push('/**');
 
   // Description - handle multi-line descriptions
   if (jsdoc.description) {
-    const descriptionLines = jsdoc.description.split("\n");
+    const descriptionLines = jsdoc.description.split('\n');
     descriptionLines.forEach((line) => {
       lines.push(` * ${line.trim()}`);
     });
   }
 
   // Add blank line after description if there are other tags
-  const hasTags =
-    jsdoc.params ||
-    jsdoc.returns ||
-    jsdoc.throws ||
-    jsdoc.example ||
-    jsdoc.tags;
+  const hasTags = jsdoc.params || jsdoc.returns || jsdoc.throws || jsdoc.example || jsdoc.tags;
   if (jsdoc.description && hasTags) {
-    lines.push(" *");
+    lines.push(' *');
   }
 
   // Parameters
   if (jsdoc.params && jsdoc.params.length > 0) {
     jsdoc.params.forEach((param) => {
-      const defaultValue = param.defaultValue ? `=${param.defaultValue}` : "";
+      const defaultValue = param.defaultValue ? `=${param.defaultValue}` : '';
       const paramName = `${param.name}${defaultValue}`;
 
       // Format: @param {type} [name=default] - description
       if (param.optional) {
-        lines.push(
-          ` * @param {${param.type}} [${paramName}] - ${param.description}`,
-        );
+        lines.push(` * @param {${param.type}} [${paramName}] - ${param.description}`);
       } else {
-        lines.push(
-          ` * @param {${param.type}} ${paramName} - ${param.description}`,
-        );
+        lines.push(` * @param {${param.type}} ${paramName} - ${param.description}`);
       }
     });
   }
 
   // Returns
   if (jsdoc.returns) {
-    lines.push(
-      ` * @returns {${jsdoc.returns.type}} ${jsdoc.returns.description}`,
-    );
+    lines.push(` * @returns {${jsdoc.returns.type}} ${jsdoc.returns.description}`);
   }
 
   // Throws
@@ -463,8 +429,8 @@ export function formatJSDoc(jsdoc: JSDoc): string {
 
   // Example
   if (jsdoc.example) {
-    lines.push(" * @example");
-    const exampleLines = jsdoc.example.split("\n");
+    lines.push(' * @example');
+    const exampleLines = jsdoc.example.split('\n');
     exampleLines.forEach((line) => {
       lines.push(` * ${line}`);
     });
@@ -478,7 +444,7 @@ export function formatJSDoc(jsdoc: JSDoc): string {
   }
 
   // Closing comment
-  lines.push(" */");
+  lines.push(' */');
 
-  return lines.join("\n");
+  return lines.join('\n');
 }

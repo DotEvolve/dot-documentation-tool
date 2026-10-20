@@ -45,13 +45,13 @@ To add support for a new service type:
 
 ```typescript
 // src/handlers/MyServiceHandler.ts
-import { CodeElement, JSDoc } from "../types";
+import { CodeElement, JSDoc } from '../types';
 
 export function generateMyServiceDoc(element: CodeElement): JSDoc {
   // Check for service-specific patterns
   if (isMyServicePattern(element)) {
     return {
-      description: "Service-specific description",
+      description: 'Service-specific description',
       // ... other JSDoc fields
     };
   }
@@ -62,14 +62,14 @@ export function generateMyServiceDoc(element: CodeElement): JSDoc {
 
 function isMyServicePattern(element: CodeElement): boolean {
   // Detect service-specific code patterns
-  return element.context.imports?.includes("my-service-lib");
+  return element.context.imports?.includes('my-service-lib');
 }
 ```
 
 2. Export the handler from `src/handlers/index.ts`:
 
 ```typescript
-export * from "./MyServiceHandler";
+export * from './MyServiceHandler';
 ```
 
 3. Add unit tests in `__tests__/unit/service-handlers.test.ts`
@@ -115,10 +115,10 @@ private extractCodeElements(ast: t.File): CodeElement[] {
 Example:
 
 ```typescript
-describe("MyFeature", () => {
-  it("should handle empty input", () => {
-    const result = myFunction("");
-    expect(result).toBe("default");
+describe('MyFeature', () => {
+  it('should handle empty input', () => {
+    const result = myFunction('');
+    expect(result).toBe('default');
   });
 });
 ```
@@ -133,16 +133,16 @@ describe("MyFeature", () => {
 Example:
 
 ```typescript
-import * as fc from "fast-check";
+import * as fc from 'fast-check';
 
-describe("Property X: Description", () => {
-  it("should maintain property across all inputs", () => {
+describe('Property X: Description', () => {
+  it('should maintain property across all inputs', () => {
     fc.assert(
       fc.property(fc.string(), (input) => {
         const result = myFunction(input);
         expect(result).toBeTruthy();
       }),
-      { numRuns: 100 },
+      { numRuns: 100 }
     );
   });
 });

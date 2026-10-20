@@ -8,12 +8,7 @@
  * - State mutations (assignments to external variables)
  */
 
-import {
-  SideEffect,
-  SideEffectType,
-  ErrorPattern,
-  ErrorPatternType,
-} from "../types.js";
+import { SideEffect, SideEffectType, ErrorPattern, ErrorPatternType } from '../types.js';
 
 /**
  * Detects side effects in a function's AST node
@@ -50,7 +45,7 @@ export function detectSideEffects(node: any): SideEffect[] {
  * @param sideEffects - Array to accumulate detected side effects
  */
 function traverseNode(node: any, sideEffects: SideEffect[]): void {
-  if (!node || typeof node !== "object") {
+  if (!node || typeof node !== 'object') {
     return;
   }
 
@@ -68,7 +63,7 @@ function traverseNode(node: any, sideEffects: SideEffect[]): void {
 
   // Recursively traverse child nodes
   for (const key in node) {
-    if (key === "loc" || key === "range" || key === "start" || key === "end") {
+    if (key === 'loc' || key === 'range' || key === 'start' || key === 'end') {
       continue; // Skip location metadata
     }
 
@@ -78,7 +73,7 @@ function traverseNode(node: any, sideEffects: SideEffect[]): void {
       for (const item of child) {
         traverseNode(item, sideEffects);
       }
-    } else if (typeof child === "object" && child !== null) {
+    } else if (typeof child === 'object' && child !== null) {
       traverseNode(child, sideEffects);
     }
   }
@@ -96,20 +91,17 @@ function traverseNode(node: any, sideEffects: SideEffect[]): void {
  */
 function detectDatabaseOperations(node: any, sideEffects: SideEffect[]): void {
   // Detect Prisma operations: prisma.model.operation()
-  if (
-    node.type === "CallExpression" &&
-    node.callee?.type === "MemberExpression"
-  ) {
+  if (node.type === 'CallExpression' && node.callee?.type === 'MemberExpression') {
     const callee = node.callee;
 
     // Check for prisma.model.operation pattern
-    if (callee.object?.type === "MemberExpression") {
+    if (callee.object?.type === 'MemberExpression') {
       const objectName = callee.object.object?.name;
       const modelName = callee.object.property?.name;
       const operationName = callee.property?.name;
 
       // Common Prisma client variable names
-      const prismaNames = ["prisma", "db", "client"];
+      const prismaNames = ['prisma', 'db', 'client'];
 
       if (
         objectName &&
@@ -119,21 +111,15 @@ function detectDatabaseOperations(node: any, sideEffects: SideEffect[]): void {
       ) {
         // Prisma operations that modify data
         const mutatingOps = [
-          "create",
-          "createMany",
-          "update",
-          "updateMany",
-          "upsert",
-          "delete",
-          "deleteMany",
+          'create',
+          'createMany',
+          'update',
+          'updateMany',
+          'upsert',
+          'delete',
+          'deleteMany',
         ];
-        const readOps = [
-          "findUnique",
-          "findFirst",
-          "findMany",
-          "count",
-          "aggregate",
-        ];
+        const readOps = ['findUnique', 'findFirst', 'findMany', 'count', 'aggregate'];
 
         if (mutatingOps.includes(operationName)) {
           sideEffects.push({
@@ -158,13 +144,7 @@ function detectDatabaseOperations(node: any, sideEffects: SideEffect[]): void {
     // Check for direct SQL query execution patterns
     const methodName = callee.property?.name;
     if (methodName) {
-      const sqlMethods = [
-        "query",
-        "execute",
-        "raw",
-        "$queryRaw",
-        "$executeRaw",
-      ];
+      const sqlMethods = ['query', 'execute', 'raw', '$queryRaw', '$executeRaw'];
       if (sqlMethods.includes(methodName)) {
         sideEffects.push({
           type: SideEffectType.DATABASE,
@@ -187,18 +167,18 @@ function detectDatabaseOperations(node: any, sideEffects: SideEffect[]): void {
  * @param sideEffects - Array to accumulate detected side effects
  */
 function detectAPICallOperations(node: any, sideEffects: SideEffect[]): void {
-  if (node.type === "CallExpression") {
+  if (node.type === 'CallExpression') {
     const callee = node.callee;
 
     // Detect fetch() calls
-    if (callee.type === "Identifier" && callee.name === "fetch") {
+    if (callee.type === 'Identifier' && callee.name === 'fetch') {
       const urlArg = node.arguments?.[0];
-      let url = "external API";
+      let url = 'external API';
 
-      if (urlArg?.type === "StringLiteral") {
+      if (urlArg?.type === 'StringLiteral') {
         url = urlArg.value;
-      } else if (urlArg?.type === "TemplateLiteral" && urlArg.quasis?.[0]) {
-        url = urlArg.quasis[0].value.raw || "external API";
+      } else if (urlArg?.type === 'TemplateLiteral' && urlArg.quasis?.[0]) {
+        url = urlArg.quasis[0].value.raw || 'external API';
       }
 
       sideEffects.push({
@@ -208,30 +188,21 @@ function detectAPICallOperations(node: any, sideEffects: SideEffect[]): void {
     }
 
     // Detect axios calls: axios.get(), axios.post(), axios(), etc.
-    if (callee.type === "MemberExpression") {
+    if (callee.type === 'MemberExpression') {
       const objectName = callee.object?.name;
       const methodName = callee.property?.name;
 
-      if (objectName === "axios") {
-        const httpMethods = [
-          "get",
-          "post",
-          "put",
-          "patch",
-          "delete",
-          "head",
-          "options",
-          "request",
-        ];
+      if (objectName === 'axios') {
+        const httpMethods = ['get', 'post', 'put', 'patch', 'delete', 'head', 'options', 'request'];
 
         if (methodName && httpMethods.includes(methodName)) {
           const urlArg = node.arguments?.[0];
-          let url = "external API";
+          let url = 'external API';
 
-          if (urlArg?.type === "StringLiteral") {
+          if (urlArg?.type === 'StringLiteral') {
             url = urlArg.value;
-          } else if (urlArg?.type === "TemplateLiteral" && urlArg.quasis?.[0]) {
-            url = urlArg.quasis[0].value.raw || "external API";
+          } else if (urlArg?.type === 'TemplateLiteral' && urlArg.quasis?.[0]) {
+            url = urlArg.quasis[0].value.raw || 'external API';
           }
 
           sideEffects.push({
@@ -242,9 +213,9 @@ function detectAPICallOperations(node: any, sideEffects: SideEffect[]): void {
       }
 
       // Detect http/https module requests
-      const httpModules = ["http", "https"];
+      const httpModules = ['http', 'https'];
       if (objectName && httpModules.includes(objectName)) {
-        const requestMethods = ["request", "get", "post"];
+        const requestMethods = ['request', 'get', 'post'];
 
         if (methodName && requestMethods.includes(methodName)) {
           sideEffects.push({
@@ -256,7 +227,7 @@ function detectAPICallOperations(node: any, sideEffects: SideEffect[]): void {
     }
 
     // Detect axios() direct call
-    if (callee.type === "Identifier" && callee.name === "axios") {
+    if (callee.type === 'Identifier' && callee.name === 'axios') {
       sideEffects.push({
         type: SideEffectType.API_CALL,
         description: `Makes HTTP request using axios`,
@@ -265,10 +236,7 @@ function detectAPICallOperations(node: any, sideEffects: SideEffect[]): void {
   }
 
   // Detect await fetch or await axios patterns
-  if (
-    node.type === "AwaitExpression" &&
-    node.argument?.type === "CallExpression"
-  ) {
+  if (node.type === 'AwaitExpression' && node.argument?.type === 'CallExpression') {
     detectAPICallOperations(node.argument, sideEffects);
   }
 }
@@ -284,41 +252,38 @@ function detectAPICallOperations(node: any, sideEffects: SideEffect[]): void {
  * @param sideEffects - Array to accumulate detected side effects
  */
 function detectFileIOOperations(node: any, sideEffects: SideEffect[]): void {
-  if (
-    node.type === "CallExpression" &&
-    node.callee?.type === "MemberExpression"
-  ) {
+  if (node.type === 'CallExpression' && node.callee?.type === 'MemberExpression') {
     const callee = node.callee;
     const objectName = callee.object?.name;
     const methodName = callee.property?.name;
 
     // fs module operations
-    if (objectName === "fs" && methodName) {
+    if (objectName === 'fs' && methodName) {
       const readOps = [
-        "readFile",
-        "readFileSync",
-        "readdir",
-        "readdirSync",
-        "stat",
-        "statSync",
-        "access",
-        "accessSync",
+        'readFile',
+        'readFileSync',
+        'readdir',
+        'readdirSync',
+        'stat',
+        'statSync',
+        'access',
+        'accessSync',
       ];
       const writeOps = [
-        "writeFile",
-        "writeFileSync",
-        "appendFile",
-        "appendFileSync",
-        "mkdir",
-        "mkdirSync",
-        "rmdir",
-        "rmdirSync",
-        "unlink",
-        "unlinkSync",
-        "rename",
-        "renameSync",
-        "copyFile",
-        "copyFileSync",
+        'writeFile',
+        'writeFileSync',
+        'appendFile',
+        'appendFileSync',
+        'mkdir',
+        'mkdirSync',
+        'rmdir',
+        'rmdirSync',
+        'unlink',
+        'unlinkSync',
+        'rename',
+        'renameSync',
+        'copyFile',
+        'copyFileSync',
       ];
 
       if (readOps.includes(methodName)) {
@@ -341,24 +306,20 @@ function detectFileIOOperations(node: any, sideEffects: SideEffect[]): void {
     }
 
     // fs.promises operations (nested member expression)
-    if (callee.object?.type === "MemberExpression") {
+    if (callee.object?.type === 'MemberExpression') {
       const nestedObjectName = callee.object.object?.name;
       const nestedPropertyName = callee.object.property?.name;
 
-      if (
-        nestedObjectName === "fs" &&
-        nestedPropertyName === "promises" &&
-        methodName
-      ) {
-        const readOps = ["readFile", "readdir", "stat", "access"];
+      if (nestedObjectName === 'fs' && nestedPropertyName === 'promises' && methodName) {
+        const readOps = ['readFile', 'readdir', 'stat', 'access'];
         const writeOps = [
-          "writeFile",
-          "appendFile",
-          "mkdir",
-          "rmdir",
-          "unlink",
-          "rename",
-          "copyFile",
+          'writeFile',
+          'appendFile',
+          'mkdir',
+          'rmdir',
+          'unlink',
+          'rename',
+          'copyFile',
         ];
 
         if (readOps.includes(methodName)) {
@@ -395,11 +356,11 @@ function detectFileIOOperations(node: any, sideEffects: SideEffect[]): void {
  */
 function detectStateMutations(node: any, sideEffects: SideEffect[]): void {
   // Detect assignment expressions
-  if (node.type === "AssignmentExpression") {
+  if (node.type === 'AssignmentExpression') {
     const left = node.left;
 
     // Assignment to member expression (object.property = value)
-    if (left.type === "MemberExpression") {
+    if (left.type === 'MemberExpression') {
       const objectName = left.object?.name;
       const propertyName = left.property?.name || left.property?.value;
 
@@ -416,7 +377,7 @@ function detectStateMutations(node: any, sideEffects: SideEffect[]): void {
       }
     }
     // Assignment to identifier (variable = value)
-    else if (left.type === "Identifier") {
+    else if (left.type === 'Identifier') {
       // Note: This could be a local variable or external variable
       // Without scope analysis, we'll flag it as potential state mutation
       sideEffects.push({
@@ -427,24 +388,21 @@ function detectStateMutations(node: any, sideEffects: SideEffect[]): void {
   }
 
   // Detect array mutation methods
-  if (
-    node.type === "CallExpression" &&
-    node.callee?.type === "MemberExpression"
-  ) {
+  if (node.type === 'CallExpression' && node.callee?.type === 'MemberExpression') {
     const callee = node.callee;
     const methodName = callee.property?.name;
     const objectName = callee.object?.name;
 
     const mutatingArrayMethods = [
-      "push",
-      "pop",
-      "shift",
-      "unshift",
-      "splice",
-      "sort",
-      "reverse",
-      "fill",
-      "copyWithin",
+      'push',
+      'pop',
+      'shift',
+      'unshift',
+      'splice',
+      'sort',
+      'reverse',
+      'fill',
+      'copyWithin',
     ];
 
     if (methodName && mutatingArrayMethods.includes(methodName)) {
@@ -463,15 +421,15 @@ function detectStateMutations(node: any, sideEffects: SideEffect[]): void {
   }
 
   // Detect update expressions (++, --)
-  if (node.type === "UpdateExpression") {
+  if (node.type === 'UpdateExpression') {
     const argument = node.argument;
 
-    if (argument.type === "Identifier") {
+    if (argument.type === 'Identifier') {
       sideEffects.push({
         type: SideEffectType.STATE_MUTATION,
         description: `Modifies ${argument.name} using ${node.operator}`,
       });
-    } else if (argument.type === "MemberExpression") {
+    } else if (argument.type === 'MemberExpression') {
       const objectName = argument.object?.name;
       const propertyName = argument.property?.name || argument.property?.value;
 
@@ -506,14 +464,13 @@ export function detectErrorHandling(node: any): ErrorPattern[] {
   // Check if this is an Express error middleware (4 parameters with first being error)
   if (node.params && node.params.length === 4) {
     const firstParam = node.params[0];
-    const paramName = firstParam.name?.toLowerCase() || "";
+    const paramName = firstParam.name?.toLowerCase() || '';
 
     // Common error parameter names
-    if (paramName === "err" || paramName === "error" || paramName === "e") {
+    if (paramName === 'err' || paramName === 'error' || paramName === 'e') {
       errorPatterns.push({
         type: ErrorPatternType.ERROR_MIDDLEWARE,
-        description:
-          "Express error middleware with 4 parameters (err, req, res, next)",
+        description: 'Express error middleware with 4 parameters (err, req, res, next)',
       });
     }
   }
@@ -537,28 +494,28 @@ export function detectErrorHandling(node: any): ErrorPattern[] {
  * @param errorPatterns - Array to accumulate detected error patterns
  */
 function traverseForErrors(node: any, errorPatterns: ErrorPattern[]): void {
-  if (!node || typeof node !== "object") {
+  if (!node || typeof node !== 'object') {
     return;
   }
 
   // Detect try-catch blocks
-  if (node.type === "TryStatement") {
+  if (node.type === 'TryStatement') {
     detectTryCatchBlock(node, errorPatterns);
   }
 
   // Detect throw statements
-  if (node.type === "ThrowStatement") {
+  if (node.type === 'ThrowStatement') {
     detectThrowStatement(node, errorPatterns);
   }
 
   // Detect error handler patterns (functions that handle errors)
-  if (node.type === "CallExpression") {
+  if (node.type === 'CallExpression') {
     detectErrorHandlerCall(node, errorPatterns);
   }
 
   // Recursively traverse child nodes
   for (const key in node) {
-    if (key === "loc" || key === "range" || key === "start" || key === "end") {
+    if (key === 'loc' || key === 'range' || key === 'start' || key === 'end') {
       continue; // Skip location metadata
     }
 
@@ -568,7 +525,7 @@ function traverseForErrors(node: any, errorPatterns: ErrorPattern[]): void {
       for (const item of child) {
         traverseForErrors(item, errorPatterns);
       }
-    } else if (typeof child === "object" && child !== null) {
+    } else if (typeof child === 'object' && child !== null) {
       traverseForErrors(child, errorPatterns);
     }
   }
@@ -586,10 +543,10 @@ function detectTryCatchBlock(node: any, errorPatterns: ErrorPattern[]): void {
   if (handler && handler.param) {
     const errorParam = handler.param;
     let errorType: string | undefined;
-    let errorName = "error";
+    let errorName = 'error';
 
     // Get error parameter name
-    if (errorParam.type === "Identifier") {
+    if (errorParam.type === 'Identifier') {
       errorName = errorParam.name;
     }
 
@@ -597,17 +554,14 @@ function detectTryCatchBlock(node: any, errorPatterns: ErrorPattern[]): void {
     if (errorParam.typeAnnotation) {
       const typeAnnotation = errorParam.typeAnnotation.typeAnnotation;
       if (typeAnnotation) {
-        if (
-          typeAnnotation.type === "TSTypeReference" &&
-          typeAnnotation.typeName
-        ) {
+        if (typeAnnotation.type === 'TSTypeReference' && typeAnnotation.typeName) {
           errorType = typeAnnotation.typeName.name;
-        } else if (typeAnnotation.type === "TSUnionType") {
+        } else if (typeAnnotation.type === 'TSUnionType') {
           // Handle union types like Error | CustomError
           const types = typeAnnotation.types
             .map((t: any) => t.typeName?.name || t.type)
             .filter(Boolean);
-          errorType = types.join(" | ");
+          errorType = types.join(' | ');
         }
       }
     }
@@ -630,7 +584,7 @@ function detectTryCatchBlock(node: any, errorPatterns: ErrorPattern[]): void {
     // Catch block without parameter (catch { ... })
     errorPatterns.push({
       type: ErrorPatternType.TRY_CATCH,
-      description: "Catches and handles errors without accessing error object",
+      description: 'Catches and handles errors without accessing error object',
     });
   }
 
@@ -638,7 +592,7 @@ function detectTryCatchBlock(node: any, errorPatterns: ErrorPattern[]): void {
   if (node.finalizer) {
     errorPatterns.push({
       type: ErrorPatternType.TRY_CATCH,
-      description: "Includes finally block for cleanup operations",
+      description: 'Includes finally block for cleanup operations',
     });
   }
 }
@@ -650,29 +604,22 @@ function detectTryCatchBlock(node: any, errorPatterns: ErrorPattern[]): void {
  * @param errorName - Name of the error parameter
  * @returns Detected error type or undefined
  */
-function detectErrorTypeInCatchBlock(
-  catchBody: any,
-  errorName: string,
-): string | undefined {
+function detectErrorTypeInCatchBlock(catchBody: any, errorName: string): string | undefined {
   if (!catchBody || !catchBody.body) {
     return undefined;
   }
 
   // Look for instanceof checks in the catch block
   for (const statement of catchBody.body) {
-    if (statement.type === "IfStatement") {
+    if (statement.type === 'IfStatement') {
       const test = statement.test;
 
       // Check for: error instanceof ErrorType
-      if (test.type === "BinaryExpression" && test.operator === "instanceof") {
+      if (test.type === 'BinaryExpression' && test.operator === 'instanceof') {
         const left = test.left;
         const right = test.right;
 
-        if (
-          left.type === "Identifier" &&
-          left.name === errorName &&
-          right.type === "Identifier"
-        ) {
+        if (left.type === 'Identifier' && left.name === errorName && right.type === 'Identifier') {
           return right.name;
         }
       }
@@ -694,7 +641,7 @@ function detectThrowStatement(node: any, errorPatterns: ErrorPattern[]): void {
   if (!argument) {
     errorPatterns.push({
       type: ErrorPatternType.THROW,
-      description: "Throws an error",
+      description: 'Throws an error',
     });
     return;
   }
@@ -703,10 +650,10 @@ function detectThrowStatement(node: any, errorPatterns: ErrorPattern[]): void {
   let errorMessage: string | undefined;
 
   // Detect: throw new ErrorType(message)
-  if (argument.type === "NewExpression" && argument.callee) {
-    if (argument.callee.type === "Identifier") {
+  if (argument.type === 'NewExpression' && argument.callee) {
+    if (argument.callee.type === 'Identifier') {
       errorType = argument.callee.name;
-    } else if (argument.callee.type === "MemberExpression") {
+    } else if (argument.callee.type === 'MemberExpression') {
       // Handle: throw new CustomErrors.ValidationError()
       const object = argument.callee.object?.name;
       const property = argument.callee.property?.name;
@@ -716,10 +663,10 @@ function detectThrowStatement(node: any, errorPatterns: ErrorPattern[]): void {
     // Extract error message if it's a string literal
     if (argument.arguments && argument.arguments.length > 0) {
       const firstArg = argument.arguments[0];
-      if (firstArg.type === "StringLiteral") {
+      if (firstArg.type === 'StringLiteral') {
         errorMessage = firstArg.value;
       } else if (
-        firstArg.type === "TemplateLiteral" &&
+        firstArg.type === 'TemplateLiteral' &&
         firstArg.quasis &&
         firstArg.quasis.length > 0
       ) {
@@ -728,19 +675,19 @@ function detectThrowStatement(node: any, errorPatterns: ErrorPattern[]): void {
     }
   }
   // Detect: throw error (re-throwing)
-  else if (argument.type === "Identifier") {
-    errorType = "existing error";
+  else if (argument.type === 'Identifier') {
+    errorType = 'existing error';
   }
   // Detect: throw "error message" (string literal)
-  else if (argument.type === "StringLiteral") {
+  else if (argument.type === 'StringLiteral') {
     errorMessage = argument.value;
   }
 
   const description = errorType
-    ? `Throws ${errorType}${errorMessage ? `: "${errorMessage}"` : ""}`
+    ? `Throws ${errorType}${errorMessage ? `: "${errorMessage}"` : ''}`
     : errorMessage
       ? `Throws error: "${errorMessage}"`
-      : "Throws an error";
+      : 'Throws an error';
 
   errorPatterns.push({
     type: ErrorPatternType.THROW,
@@ -755,20 +702,17 @@ function detectThrowStatement(node: any, errorPatterns: ErrorPattern[]): void {
  * @param node - CallExpression AST node
  * @param errorPatterns - Array to accumulate detected error patterns
  */
-function detectErrorHandlerCall(
-  node: any,
-  errorPatterns: ErrorPattern[],
-): void {
+function detectErrorHandlerCall(node: any, errorPatterns: ErrorPattern[]): void {
   const callee = node.callee;
 
   // Detect .catch() calls on promises
-  if (callee.type === "MemberExpression" && callee.property?.name === "catch") {
+  if (callee.type === 'MemberExpression' && callee.property?.name === 'catch') {
     const handler = node.arguments?.[0];
 
     if (handler) {
       errorPatterns.push({
         type: ErrorPatternType.ERROR_HANDLER,
-        description: "Handles promise rejection with .catch()",
+        description: 'Handles promise rejection with .catch()',
       });
     }
     return; // Don't check for error-first callback if it's a .catch()
@@ -776,22 +720,20 @@ function detectErrorHandlerCall(
 
   // Detect error-first callback pattern (callback with error as first parameter)
   // Only for regular function calls, not .catch()
-  if (callee.type === "Identifier" || callee.type === "MemberExpression") {
+  if (callee.type === 'Identifier' || callee.type === 'MemberExpression') {
     const callbackArg = node.arguments?.find(
-      (arg: any) =>
-        arg.type === "FunctionExpression" ||
-        arg.type === "ArrowFunctionExpression",
+      (arg: any) => arg.type === 'FunctionExpression' || arg.type === 'ArrowFunctionExpression'
     );
 
     if (callbackArg && callbackArg.params && callbackArg.params.length > 0) {
       const firstParam = callbackArg.params[0];
-      const paramName = firstParam.name?.toLowerCase() || "";
+      const paramName = firstParam.name?.toLowerCase() || '';
 
       // Common error parameter names in callbacks
-      if (paramName === "err" || paramName === "error" || paramName === "e") {
+      if (paramName === 'err' || paramName === 'error' || paramName === 'e') {
         errorPatterns.push({
           type: ErrorPatternType.ERROR_HANDLER,
-          description: "Uses error-first callback pattern",
+          description: 'Uses error-first callback pattern',
         });
       }
     }
