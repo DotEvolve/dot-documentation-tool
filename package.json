@@ -10,7 +10,9 @@
     "test:property": "jest __tests__/property",
     "test:watch": "jest --watch",
     "test:coverage": "jest --coverage",
-    "prepare": "husky"
+    "prepare": "husky",
+    "lint": "tsc --noEmit",
+    "format": "prettier --write ."
   },
   "keywords": [
     "documentation",
