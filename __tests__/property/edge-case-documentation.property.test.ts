@@ -1,11 +1,6 @@
-import * as fc from "fast-check";
-import { generateJSDoc } from "../../src/generators/JSDocGenerator";
-import {
-  CodeElement,
-  CodeElementType,
-  FunctionSignature,
-  Parameter,
-} from "../../src/types";
+import * as fc from 'fast-check';
+import { generateJSDoc } from '../../src/generators/JSDocGenerator';
+import { CodeElement, CodeElementType, FunctionSignature, Parameter } from '../../src/types';
 
 /**
  * Feature: comprehensive-service-documentation
@@ -17,16 +12,16 @@ import {
  * empty collections), the JSDoc or inline comments SHALL document the special
  * behavior for these cases.
  */
-describe("Property 4: Edge Case Documentation", () => {
+describe('Property 4: Edge Case Documentation', () => {
   // Generator for edge case descriptions
   const edgeCaseArb = fc.oneof(
-    fc.constant("null"),
-    fc.constant("undefined"),
-    fc.constant("empty array"),
-    fc.constant("empty string"),
-    fc.constant("zero"),
-    fc.constant("negative number"),
-    fc.constant("boundary value"),
+    fc.constant('null'),
+    fc.constant('undefined'),
+    fc.constant('empty array'),
+    fc.constant('empty string'),
+    fc.constant('zero'),
+    fc.constant('negative number'),
+    fc.constant('boundary value')
   );
 
   // Generator for functions with edge case handling
@@ -39,12 +34,12 @@ describe("Property 4: Edge Case Documentation", () => {
       minLength: 3,
       maxLength: 10,
     }),
-    paramType: fc.constantFrom("string", "number", "array", "object"),
+    paramType: fc.constantFrom('string', 'number', 'array', 'object'),
     edgeCase: edgeCaseArb,
-    returnType: fc.constantFrom("void", "string", "number", "boolean"),
+    returnType: fc.constantFrom('void', 'string', 'number', 'boolean'),
   });
 
-  it("should document edge case handling in parameter descriptions", () => {
+  it('should document edge case handling in parameter descriptions', () => {
     fc.assert(
       fc.property(functionWithEdgeCasesArb, (funcData) => {
         const edgeCaseDescription = `Handles ${funcData.edgeCase} by returning default value`;
@@ -66,7 +61,7 @@ describe("Property 4: Edge Case Documentation", () => {
         const element: CodeElement = {
           type: CodeElementType.FUNCTION,
           name: funcData.name,
-          filePath: "test.ts",
+          filePath: 'test.ts',
           lineNumber: 1,
           signature,
           context: {},
@@ -83,34 +78,34 @@ describe("Property 4: Edge Case Documentation", () => {
         expect(paramDoc?.description).toBeTruthy();
         expect(paramDoc?.description.length).toBeGreaterThan(0);
       }),
-      { numRuns: 100 },
+      { numRuns: 100 }
     );
   });
 
-  it("should document null/undefined handling", () => {
+  it('should document null/undefined handling', () => {
     fc.assert(
       fc.property(
         fc.string({ minLength: 5, maxLength: 10 }),
-        fc.constantFrom("null", "undefined", "null or undefined"),
+        fc.constantFrom('null', 'undefined', 'null or undefined'),
         (paramName, edgeCase) => {
           const parameter: Parameter = {
             name: paramName,
-            type: "string | null | undefined",
+            type: 'string | null | undefined',
             optional: true,
             description: `Returns empty string when ${edgeCase}`,
           };
 
           const signature: FunctionSignature = {
-            name: "handleNullable",
+            name: 'handleNullable',
             parameters: [parameter],
-            returnType: "string",
+            returnType: 'string',
             isAsync: false,
           };
 
           const element: CodeElement = {
             type: CodeElementType.FUNCTION,
-            name: "handleNullable",
-            filePath: "test.ts",
+            name: 'handleNullable',
+            filePath: 'test.ts',
             lineNumber: 1,
             signature,
             context: {},
@@ -123,17 +118,17 @@ describe("Property 4: Edge Case Documentation", () => {
           expect(jsdoc.params?.[0].name).toBe(paramName);
           expect(jsdoc.params?.[0].description).toBeTruthy();
           expect(jsdoc.params?.[0].description.length).toBeGreaterThan(0);
-        },
+        }
       ),
-      { numRuns: 100 },
+      { numRuns: 100 }
     );
   });
 
-  it("should document empty collection handling", () => {
+  it('should document empty collection handling', () => {
     fc.assert(
       fc.property(
         fc.string({ minLength: 5, maxLength: 10 }),
-        fc.constantFrom("array", "object", "string"),
+        fc.constantFrom('array', 'object', 'string'),
         (paramName, collectionType) => {
           const parameter: Parameter = {
             name: paramName,
@@ -143,16 +138,16 @@ describe("Property 4: Edge Case Documentation", () => {
           };
 
           const signature: FunctionSignature = {
-            name: "handleEmpty",
+            name: 'handleEmpty',
             parameters: [parameter],
-            returnType: "any",
+            returnType: 'any',
             isAsync: false,
           };
 
           const element: CodeElement = {
             type: CodeElementType.FUNCTION,
-            name: "handleEmpty",
-            filePath: "test.ts",
+            name: 'handleEmpty',
+            filePath: 'test.ts',
             lineNumber: 1,
             signature,
             context: {},
@@ -165,13 +160,13 @@ describe("Property 4: Edge Case Documentation", () => {
           expect(jsdoc.params?.[0].name).toBe(paramName);
           expect(jsdoc.params?.[0].description).toBeTruthy();
           expect(jsdoc.params?.[0].description.length).toBeGreaterThan(0);
-        },
+        }
       ),
-      { numRuns: 100 },
+      { numRuns: 100 }
     );
   });
 
-  it("should document boundary value handling", () => {
+  it('should document boundary value handling', () => {
     fc.assert(
       fc.property(
         fc.string({ minLength: 5, maxLength: 10 }),
@@ -179,27 +174,26 @@ describe("Property 4: Edge Case Documentation", () => {
         fc.integer({ min: -100, max: 100 }),
         (paramName, minValue, maxValue) => {
           // Ensure min < max
-          const [min, max] =
-            minValue < maxValue ? [minValue, maxValue] : [maxValue, minValue];
+          const [min, max] = minValue < maxValue ? [minValue, maxValue] : [maxValue, minValue];
 
           const parameter: Parameter = {
             name: paramName,
-            type: "number",
+            type: 'number',
             optional: false,
             description: `Clamps value to range [${min}, ${max}]`,
           };
 
           const signature: FunctionSignature = {
-            name: "clampValue",
+            name: 'clampValue',
             parameters: [parameter],
-            returnType: "number",
+            returnType: 'number',
             isAsync: false,
           };
 
           const element: CodeElement = {
             type: CodeElementType.FUNCTION,
-            name: "clampValue",
-            filePath: "test.ts",
+            name: 'clampValue',
+            filePath: 'test.ts',
             lineNumber: 1,
             signature,
             context: {},
@@ -212,9 +206,9 @@ describe("Property 4: Edge Case Documentation", () => {
           expect(jsdoc.params?.[0].name).toBe(paramName);
           expect(jsdoc.params?.[0].description).toBeTruthy();
           expect(jsdoc.params?.[0].description.length).toBeGreaterThan(0);
-        },
+        }
       ),
-      { numRuns: 100 },
+      { numRuns: 100 }
     );
   });
 });

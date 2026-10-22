@@ -10,4 +10,4 @@ export {
   Glossary,
   TerminologyIssue,
   ValidationIssue,
-} from "./DocumentationValidator.js";
+} from './DocumentationValidator.js';

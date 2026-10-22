@@ -7,15 +7,22 @@ registries:
     token: ${{secrets.NPM_TOKEN}}
 
 updates:
-  - package-ecosystem: "npm"
-    directory: "/"
+  - package-ecosystem: npm
+    directory: /
     registries:
       - github-packages
     schedule:
       interval: weekly
+    target-branch: dev
     open-pull-requests-limit: 3
+    groups:
+      dotevolve-packages:
+        patterns:
+          - '@dotevolve/*'
 
-  - package-ecosystem: "github-actions"
-    directory: "/"
+  - package-ecosystem: github-actions
+    directory: /
     schedule:
-      interval: "weekly"
+      interval: weekly
+    target-branch: dev
+    open-pull-requests-limit: 3

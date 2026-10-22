@@ -5,7 +5,7 @@
  * Handles React components, hooks, state management, API clients, and routing.
  */
 
-import { CodeElement, JSDoc, ParamDoc } from "../types.js";
+import { CodeElement, JSDoc, ParamDoc } from '../types.js';
 
 /**
  * Generates specialized documentation for Frontend components
@@ -52,7 +52,7 @@ export function generateFrontendDoc(element: CodeElement): JSDoc {
 function isReactComponent(element: CodeElement): boolean {
   const name = element.name;
   // React components start with uppercase letter
-  return /^[A-Z]/.test(name) && !name.startsWith("use");
+  return /^[A-Z]/.test(name) && !name.startsWith('use');
 }
 
 /**
@@ -63,7 +63,7 @@ function isReactComponent(element: CodeElement): boolean {
  */
 function isCustomHook(element: CodeElement): boolean {
   const name = element.name;
-  return name.startsWith("use") && /^use[A-Z]/.test(name);
+  return name.startsWith('use') && /^use[A-Z]/.test(name);
 }
 
 /**
@@ -75,10 +75,10 @@ function isCustomHook(element: CodeElement): boolean {
 function isStateManagement(element: CodeElement): boolean {
   const name = element.name.toLowerCase();
   return (
-    name.includes("store") ||
-    name.includes("reducer") ||
-    name.includes("action") ||
-    name.includes("context")
+    name.includes('store') ||
+    name.includes('reducer') ||
+    name.includes('action') ||
+    name.includes('context')
   );
 }
 
@@ -91,11 +91,11 @@ function isStateManagement(element: CodeElement): boolean {
 function isAPIClient(element: CodeElement): boolean {
   const name = element.name.toLowerCase();
   return (
-    name.includes("api") ||
-    name.includes("client") ||
-    name.includes("service") ||
-    name.includes("fetch") ||
-    name.includes("request")
+    name.includes('api') ||
+    name.includes('client') ||
+    name.includes('service') ||
+    name.includes('fetch') ||
+    name.includes('request')
   );
 }
 
@@ -107,11 +107,7 @@ function isAPIClient(element: CodeElement): boolean {
  */
 function isRoutingConfig(element: CodeElement): boolean {
   const name = element.name.toLowerCase();
-  return (
-    name.includes("route") ||
-    name.includes("router") ||
-    name.includes("navigation")
-  );
+  return name.includes('route') || name.includes('router') || name.includes('navigation');
 }
 
 /**
@@ -124,8 +120,8 @@ function generateReactComponentDoc(element: CodeElement): JSDoc {
   const params: ParamDoc[] =
     element.signature?.parameters.map((p) => ({
       name: p.name,
-      type: p.type || "any",
-      description: `${p.name === "props" ? "Component props" : `Component prop: ${p.name}`}`,
+      type: p.type || 'any',
+      description: `${p.name === 'props' ? 'Component props' : `Component prop: ${p.name}`}`,
       optional: p.optional,
     })) || [];
 
@@ -133,14 +129,14 @@ function generateReactComponentDoc(element: CodeElement): JSDoc {
     description: `React component that renders UI elements. Manages component state, handles user interactions, and integrates with application state. Follows React best practices for performance and maintainability.`,
     params,
     returns: {
-      type: "JSX.Element",
-      description: "Rendered React component",
+      type: 'JSX.Element',
+      description: 'Rendered React component',
     },
     tags: {
-      component: "react",
-      ui: "true",
+      component: 'react',
+      ui: 'true',
     },
-    example: `// Usage:\n// <${element.name} ${params.length > 0 ? `${params[0].name}={...}` : ""} />`,
+    example: `// Usage:\n// <${element.name} ${params.length > 0 ? `${params[0].name}={...}` : ''} />`,
   };
 }
 
@@ -154,7 +150,7 @@ function generateCustomHookDoc(element: CodeElement): JSDoc {
   const params: ParamDoc[] =
     element.signature?.parameters.map((p) => ({
       name: p.name,
-      type: p.type || "any",
+      type: p.type || 'any',
       description: `Hook parameter: ${p.name}`,
       optional: p.optional,
     })) || [];
@@ -163,15 +159,15 @@ function generateCustomHookDoc(element: CodeElement): JSDoc {
     description: `Custom React hook that encapsulates reusable stateful logic. Follows React hooks rules and can use other hooks internally. Provides a clean API for component logic reuse.`,
     params,
     returns: {
-      type: element.signature?.returnType || "any",
-      description: "Hook return value containing state and functions",
+      type: element.signature?.returnType || 'any',
+      description: 'Hook return value containing state and functions',
     },
     tags: {
-      hook: "custom",
-      react: "true",
-      reusable: "true",
+      hook: 'custom',
+      react: 'true',
+      reusable: 'true',
     },
-    example: `// Usage:\n// const result = ${element.name}(${params.map((p) => p.name).join(", ")});`,
+    example: `// Usage:\n// const result = ${element.name}(${params.map((p) => p.name).join(', ')});`,
   };
 }
 
@@ -185,8 +181,8 @@ function generateStateManagementDoc(element: CodeElement): JSDoc {
   const params: ParamDoc[] =
     element.signature?.parameters.map((p) => ({
       name: p.name,
-      type: p.type || "any",
-      description: `${p.name.includes("state") ? "Current state" : p.name.includes("action") ? "Action to dispatch" : `State management parameter: ${p.name}`}`,
+      type: p.type || 'any',
+      description: `${p.name.includes('state') ? 'Current state' : p.name.includes('action') ? 'Action to dispatch' : `State management parameter: ${p.name}`}`,
       optional: p.optional,
     })) || [];
 
@@ -194,12 +190,12 @@ function generateStateManagementDoc(element: CodeElement): JSDoc {
     description: `State management logic for application state. Handles state updates, action dispatching, and state derivation. Ensures predictable state changes and enables time-travel debugging.`,
     params,
     returns: {
-      type: element.signature?.returnType || "any",
-      description: "Updated state or state accessor",
+      type: element.signature?.returnType || 'any',
+      description: 'Updated state or state accessor',
     },
     tags: {
-      state: "management",
-      pattern: "redux/context",
+      state: 'management',
+      pattern: 'redux/context',
     },
   };
 }
@@ -214,8 +210,8 @@ function generateAPIClientDoc(element: CodeElement): JSDoc {
   const params: ParamDoc[] =
     element.signature?.parameters.map((p) => ({
       name: p.name,
-      type: p.type || "any",
-      description: `${p.name.includes("id") ? "Resource identifier" : p.name.includes("data") ? "Request payload data" : `API parameter: ${p.name}`}`,
+      type: p.type || 'any',
+      description: `${p.name.includes('id') ? 'Resource identifier' : p.name.includes('data') ? 'Request payload data' : `API parameter: ${p.name}`}`,
       optional: p.optional,
     })) || [];
 
@@ -223,27 +219,27 @@ function generateAPIClientDoc(element: CodeElement): JSDoc {
     description: `API client function that communicates with backend services. Handles HTTP requests, response parsing, error handling, and authentication. Provides type-safe interface for backend API consumption.`,
     params,
     returns: {
-      type: element.signature?.returnType || "Promise<any>",
-      description: "API response data",
+      type: element.signature?.returnType || 'Promise<any>',
+      description: 'API response data',
     },
     throws: [
       {
-        type: "NetworkError",
-        condition: "When network request fails",
+        type: 'NetworkError',
+        condition: 'When network request fails',
       },
       {
-        type: "APIError",
-        condition: "When API returns error response",
+        type: 'APIError',
+        condition: 'When API returns error response',
       },
       {
-        type: "AuthenticationError",
-        condition: "When authentication token is invalid or expired",
+        type: 'AuthenticationError',
+        condition: 'When authentication token is invalid or expired',
       },
     ],
     tags: {
-      api: "client",
-      http: "true",
-      async: "true",
+      api: 'client',
+      http: 'true',
+      async: 'true',
     },
   };
 }
@@ -258,7 +254,7 @@ function generateRoutingDoc(element: CodeElement): JSDoc {
   const params: ParamDoc[] =
     element.signature?.parameters.map((p) => ({
       name: p.name,
-      type: p.type || "any",
+      type: p.type || 'any',
       description: `Routing parameter: ${p.name}`,
       optional: p.optional,
     })) || [];
@@ -267,12 +263,12 @@ function generateRoutingDoc(element: CodeElement): JSDoc {
     description: `Application routing configuration that defines navigation structure. Maps URLs to components, handles route parameters, and manages navigation guards. Enables deep linking and browser history integration.`,
     params,
     returns: {
-      type: element.signature?.returnType || "JSX.Element",
-      description: "Router configuration or route component",
+      type: element.signature?.returnType || 'JSX.Element',
+      description: 'Router configuration or route component',
     },
     tags: {
-      routing: "react-router",
-      navigation: "true",
+      routing: 'react-router',
+      navigation: 'true',
     },
   };
 }
@@ -289,13 +285,13 @@ function generateDefaultDoc(element: CodeElement): JSDoc {
     params:
       element.signature?.parameters.map((p) => ({
         name: p.name,
-        type: p.type || "any",
+        type: p.type || 'any',
         description: `Parameter ${p.name}`,
         optional: p.optional,
       })) || [],
     returns: {
-      type: element.signature?.returnType || "any",
-      description: "Function return value",
+      type: element.signature?.returnType || 'any',
+      description: 'Function return value',
     },
   };
 }

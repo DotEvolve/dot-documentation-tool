@@ -4,8 +4,8 @@
  * Validates: Requirements 11.4
  */
 
-import * as fc from "fast-check";
-import { FunctionSignature, JSDoc, ParamDoc } from "../../src/types";
+import * as fc from 'fast-check';
+import { FunctionSignature, JSDoc, ParamDoc } from '../../src/types';
 
 /**
  * Arbitrary generator for Parameter objects
@@ -14,29 +14,29 @@ const parameterArbitrary = fc.record({
   name: fc.stringMatching(/^[a-zA-Z_][a-zA-Z0-9_]*$/),
   type: fc.option(
     fc.oneof(
-      fc.constant("string"),
-      fc.constant("number"),
-      fc.constant("boolean"),
-      fc.constant("any"),
-      fc.constant("void"),
-      fc.constant("object"),
-      fc.constant("Array<string>"),
-      fc.constant("Record<string, any>"),
+      fc.constant('string'),
+      fc.constant('number'),
+      fc.constant('boolean'),
+      fc.constant('any'),
+      fc.constant('void'),
+      fc.constant('object'),
+      fc.constant('Array<string>'),
+      fc.constant('Record<string, any>')
     ),
-    { nil: undefined },
+    { nil: undefined }
   ),
   optional: fc.boolean(),
   defaultValue: fc.option(
     fc.oneof(
-      fc.constant("null"),
-      fc.constant("undefined"),
+      fc.constant('null'),
+      fc.constant('undefined'),
       fc.constant('""'),
-      fc.constant("0"),
-      fc.constant("false"),
-      fc.constant("[]"),
-      fc.constant("{}"),
+      fc.constant('0'),
+      fc.constant('false'),
+      fc.constant('[]'),
+      fc.constant('{}')
     ),
-    { nil: undefined },
+    { nil: undefined }
   ),
   description: fc.option(fc.lorem({ maxCount: 10 }), { nil: undefined }),
 });
@@ -49,21 +49,20 @@ const functionSignatureArbitrary = fc.record({
   parameters: fc.array(parameterArbitrary, { minLength: 0, maxLength: 10 }),
   returnType: fc.option(
     fc.oneof(
-      fc.constant("string"),
-      fc.constant("number"),
-      fc.constant("boolean"),
-      fc.constant("void"),
-      fc.constant("Promise<void>"),
-      fc.constant("Promise<string>"),
-      fc.constant("any"),
+      fc.constant('string'),
+      fc.constant('number'),
+      fc.constant('boolean'),
+      fc.constant('void'),
+      fc.constant('Promise<void>'),
+      fc.constant('Promise<string>'),
+      fc.constant('any')
     ),
-    { nil: undefined },
+    { nil: undefined }
   ),
   isAsync: fc.boolean(),
-  throws: fc.option(
-    fc.array(fc.lorem({ maxCount: 5 }), { minLength: 0, maxLength: 3 }),
-    { nil: undefined },
-  ),
+  throws: fc.option(fc.array(fc.lorem({ maxCount: 5 }), { minLength: 0, maxLength: 3 }), {
+    nil: undefined,
+  }),
   sideEffects: fc.option(fc.constant([]), { nil: undefined }),
 });
 
@@ -74,7 +73,7 @@ const functionSignatureArbitrary = fc.record({
 function generateJSDocFromSignature(signature: FunctionSignature): JSDoc {
   const params: ParamDoc[] = signature.parameters.map((param) => ({
     name: param.name,
-    type: param.type || "any",
+    type: param.type || 'any',
     description: param.description || `Parameter ${param.name}`,
     optional: param.optional,
     defaultValue: param.defaultValue,
@@ -84,7 +83,7 @@ function generateJSDocFromSignature(signature: FunctionSignature): JSDoc {
     description: `Function ${signature.name}`,
     params: params.length > 0 ? params : undefined,
     returns:
-      signature.returnType && signature.returnType !== "void"
+      signature.returnType && signature.returnType !== 'void'
         ? {
             type: signature.returnType,
             description: `Returns ${signature.returnType}`,
@@ -107,8 +106,8 @@ function generateJSDocFromSignature(signature: FunctionSignature): JSDoc {
  * the actual function parameters in name and order, and the documented return type
  * SHALL match the actual return type.
  */
-describe("Property 18: Documentation-Code Synchronization", () => {
-  it("should maintain parameter name and order consistency between signature and JSDoc", () => {
+describe('Property 18: Documentation-Code Synchronization', () => {
+  it('should maintain parameter name and order consistency between signature and JSDoc', () => {
     fc.assert(
       fc.property(functionSignatureArbitrary, (signature) => {
         // Generate JSDoc from the function signature
@@ -130,11 +129,11 @@ describe("Property 18: Documentation-Code Synchronization", () => {
 
         return true;
       }),
-      { numRuns: 100 },
+      { numRuns: 100 }
     );
   });
 
-  it("should maintain parameter type consistency between signature and JSDoc", () => {
+  it('should maintain parameter type consistency between signature and JSDoc', () => {
     fc.assert(
       fc.property(functionSignatureArbitrary, (signature) => {
         const jsdoc = generateJSDocFromSignature(signature as any);
@@ -142,18 +141,18 @@ describe("Property 18: Documentation-Code Synchronization", () => {
         // Property: Parameter types in JSDoc should match signature types
         if (signature.parameters.length > 0 && jsdoc.params) {
           signature.parameters.forEach((param, index) => {
-            const expectedType = param.type || "any";
+            const expectedType = param.type || 'any';
             expect(jsdoc.params![index].type).toBe(expectedType);
           });
         }
 
         return true;
       }),
-      { numRuns: 100 },
+      { numRuns: 100 }
     );
   });
 
-  it("should maintain optional flag consistency between signature and JSDoc", () => {
+  it('should maintain optional flag consistency between signature and JSDoc', () => {
     fc.assert(
       fc.property(functionSignatureArbitrary, (signature) => {
         const jsdoc = generateJSDocFromSignature(signature as any);
@@ -167,17 +166,17 @@ describe("Property 18: Documentation-Code Synchronization", () => {
 
         return true;
       }),
-      { numRuns: 100 },
+      { numRuns: 100 }
     );
   });
 
-  it("should maintain return type consistency between signature and JSDoc", () => {
+  it('should maintain return type consistency between signature and JSDoc', () => {
     fc.assert(
       fc.property(functionSignatureArbitrary, (signature) => {
         const jsdoc = generateJSDocFromSignature(signature as any);
 
         // Property: Return type in JSDoc should match signature return type
-        if (signature.returnType && signature.returnType !== "void") {
+        if (signature.returnType && signature.returnType !== 'void') {
           expect(jsdoc.returns).toBeDefined();
           expect(jsdoc.returns!.type).toBe(signature.returnType);
         } else {
@@ -187,11 +186,11 @@ describe("Property 18: Documentation-Code Synchronization", () => {
 
         return true;
       }),
-      { numRuns: 100 },
+      { numRuns: 100 }
     );
   });
 
-  it("should maintain throws consistency between signature and JSDoc", () => {
+  it('should maintain throws consistency between signature and JSDoc', () => {
     fc.assert(
       fc.property(functionSignatureArbitrary, (signature) => {
         const jsdoc = generateJSDocFromSignature(signature as any);
@@ -211,11 +210,11 @@ describe("Property 18: Documentation-Code Synchronization", () => {
 
         return true;
       }),
-      { numRuns: 100 },
+      { numRuns: 100 }
     );
   });
 
-  it("should maintain default value consistency between signature and JSDoc", () => {
+  it('should maintain default value consistency between signature and JSDoc', () => {
     fc.assert(
       fc.property(functionSignatureArbitrary, (signature) => {
         const jsdoc = generateJSDocFromSignature(signature as any);
@@ -224,16 +223,14 @@ describe("Property 18: Documentation-Code Synchronization", () => {
         if (signature.parameters.length > 0 && jsdoc.params) {
           signature.parameters.forEach((param, index) => {
             if (param.defaultValue) {
-              expect(jsdoc.params![index].defaultValue).toBe(
-                param.defaultValue,
-              );
+              expect(jsdoc.params![index].defaultValue).toBe(param.defaultValue);
             }
           });
         }
 
         return true;
       }),
-      { numRuns: 100 },
+      { numRuns: 100 }
     );
   });
 });

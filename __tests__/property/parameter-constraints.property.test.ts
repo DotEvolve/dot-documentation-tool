@@ -1,11 +1,6 @@
-import * as fc from "fast-check";
-import { generateJSDoc } from "../../src/generators/JSDocGenerator";
-import {
-  CodeElement,
-  CodeElementType,
-  FunctionSignature,
-  Parameter,
-} from "../../src/types";
+import * as fc from 'fast-check';
+import { generateJSDoc } from '../../src/generators/JSDocGenerator';
+import { CodeElement, CodeElementType, FunctionSignature, Parameter } from '../../src/types';
 
 /**
  * Feature: comprehensive-service-documentation
@@ -16,30 +11,30 @@ import {
  * For any function parameter that has constraints (valid ranges, allowed values,
  * null/undefined handling), the @param JSDoc tag SHALL document these constraints.
  */
-describe("Property 3: Parameter Constraint Documentation", () => {
+describe('Property 3: Parameter Constraint Documentation', () => {
   // Generator for parameters with constraints
   const constrainedParameterArb = fc.record({
     name: fc.string({
       minLength: 3,
       maxLength: 10,
     }),
-    type: fc.constantFrom("number", "string", "boolean", "object"),
+    type: fc.constantFrom('number', 'string', 'boolean', 'object'),
     optional: fc.boolean(),
     constraint: fc.oneof(
       fc.record({
-        type: fc.constant("range"),
+        type: fc.constant('range'),
         min: fc.integer(),
         max: fc.integer(),
       }),
       fc.record({
-        type: fc.constant("enum"),
+        type: fc.constant('enum'),
         values: fc.array(fc.string(), { minLength: 2, maxLength: 5 }),
       }),
       fc.record({
-        type: fc.constant("nullable"),
+        type: fc.constant('nullable'),
         allowNull: fc.boolean(),
         allowUndefined: fc.boolean(),
-      }),
+      })
     ),
   });
 
@@ -53,11 +48,11 @@ describe("Property 3: Parameter Constraint Documentation", () => {
       minLength: 1,
       maxLength: 3,
     }),
-    returnType: fc.constantFrom("void", "string", "number", "boolean"),
+    returnType: fc.constantFrom('void', 'string', 'number', 'boolean'),
     isAsync: fc.boolean(),
   });
 
-  it("should document parameter constraints in JSDoc", () => {
+  it('should document parameter constraints in JSDoc', () => {
     fc.assert(
       fc.property(functionWithConstraintsArb, (funcData) => {
         // Create a CodeElement with constrained parameters
@@ -78,7 +73,7 @@ describe("Property 3: Parameter Constraint Documentation", () => {
         const element: CodeElement = {
           type: CodeElementType.FUNCTION,
           name: funcData.name,
-          filePath: "test.ts",
+          filePath: 'test.ts',
           lineNumber: 1,
           signature,
           context: {},
@@ -104,11 +99,11 @@ describe("Property 3: Parameter Constraint Documentation", () => {
           }
         });
       }),
-      { numRuns: 100 },
+      { numRuns: 100 }
     );
   });
 
-  it("should document range constraints for numeric parameters", () => {
+  it('should document range constraints for numeric parameters', () => {
     fc.assert(
       fc.property(
         fc.string({ minLength: 3, maxLength: 10 }),
@@ -117,22 +112,22 @@ describe("Property 3: Parameter Constraint Documentation", () => {
         (paramName, min, max) => {
           const parameter: Parameter = {
             name: paramName,
-            type: "number",
+            type: 'number',
             optional: false,
             description: `Must be between ${min} and ${max}`,
           };
 
           const signature: FunctionSignature = {
-            name: "testFunc",
+            name: 'testFunc',
             parameters: [parameter],
-            returnType: "void",
+            returnType: 'void',
             isAsync: false,
           };
 
           const element: CodeElement = {
             type: CodeElementType.FUNCTION,
-            name: "testFunc",
-            filePath: "test.ts",
+            name: 'testFunc',
+            filePath: 'test.ts',
             lineNumber: 1,
             signature,
             context: {},
@@ -145,13 +140,13 @@ describe("Property 3: Parameter Constraint Documentation", () => {
           expect(jsdoc.params?.length).toBe(1);
           expect(jsdoc.params?.[0].name).toBe(paramName);
           expect(jsdoc.params?.[0].description).toBeTruthy();
-        },
+        }
       ),
-      { numRuns: 100 },
+      { numRuns: 100 }
     );
   });
 
-  it("should document nullable/optional parameter constraints", () => {
+  it('should document nullable/optional parameter constraints', () => {
     fc.assert(
       fc.property(
         fc.string({ minLength: 3, maxLength: 10 }),
@@ -159,29 +154,29 @@ describe("Property 3: Parameter Constraint Documentation", () => {
         fc.boolean(),
         (paramName, optional, nullable) => {
           const description = nullable
-            ? "Can be null or undefined"
+            ? 'Can be null or undefined'
             : optional
-              ? "Optional parameter"
-              : "Required parameter";
+              ? 'Optional parameter'
+              : 'Required parameter';
 
           const parameter: Parameter = {
             name: paramName,
-            type: "string",
+            type: 'string',
             optional,
             description,
           };
 
           const signature: FunctionSignature = {
-            name: "testFunc",
+            name: 'testFunc',
             parameters: [parameter],
-            returnType: "void",
+            returnType: 'void',
             isAsync: false,
           };
 
           const element: CodeElement = {
             type: CodeElementType.FUNCTION,
-            name: "testFunc",
-            filePath: "test.ts",
+            name: 'testFunc',
+            filePath: 'test.ts',
             lineNumber: 1,
             signature,
             context: {},
@@ -197,9 +192,9 @@ describe("Property 3: Parameter Constraint Documentation", () => {
           expect(paramDoc?.name).toBe(paramName);
           expect(paramDoc?.optional).toBe(optional);
           expect(paramDoc?.description).toBeTruthy();
-        },
+        }
       ),
-      { numRuns: 100 },
+      { numRuns: 100 }
     );
   });
 });
@@ -208,15 +203,15 @@ describe("Property 3: Parameter Constraint Documentation", () => {
  * Helper function to generate constraint description
  */
 function generateConstraintDescription(constraint: any): string {
-  if (constraint.type === "range") {
+  if (constraint.type === 'range') {
     return `Must be between ${constraint.min} and ${constraint.max}`;
-  } else if (constraint.type === "enum") {
-    return `Must be one of: ${constraint.values.join(", ")}`;
-  } else if (constraint.type === "nullable") {
+  } else if (constraint.type === 'enum') {
+    return `Must be one of: ${constraint.values.join(', ')}`;
+  } else if (constraint.type === 'nullable') {
     const parts = [];
-    if (constraint.allowNull) parts.push("null");
-    if (constraint.allowUndefined) parts.push("undefined");
-    return parts.length > 0 ? `Can be ${parts.join(" or ")}` : "Required";
+    if (constraint.allowNull) parts.push('null');
+    if (constraint.allowUndefined) parts.push('undefined');
+    return parts.length > 0 ? `Can be ${parts.join(' or ')}` : 'Required';
   }
-  return "";
+  return '';
 }

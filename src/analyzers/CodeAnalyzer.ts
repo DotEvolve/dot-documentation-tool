@@ -5,9 +5,9 @@
  * that need documentation. Handles both JavaScript and TypeScript files.
  */
 
-import * as parser from "@babel/parser";
-import * as fs from "fs";
-import * as path from "path";
+import * as parser from '@babel/parser';
+import * as fs from 'fs';
+import * as path from 'path';
 import {
   CodeElement,
   CodeElementType,
@@ -16,7 +16,7 @@ import {
   Parameter,
   RouteInfo,
   HTTPMethod,
-} from "../types.js";
+} from '../types.js';
 
 /**
  * Main code analyzer class for parsing source files
@@ -32,16 +32,16 @@ export class CodeAnalyzer {
   analyzeFile(filePath: string): CodeElement[] {
     // Validate file extension
     const ext = path.extname(filePath);
-    if (![".js", ".ts", ".jsx", ".tsx"].includes(ext)) {
+    if (!['.js', '.ts', '.jsx', '.tsx'].includes(ext)) {
       throw new Error(
-        `Unsupported file extension: ${ext}. Only .js, .ts, .jsx, and .tsx files are supported.`,
+        `Unsupported file extension: ${ext}. Only .js, .ts, .jsx, and .tsx files are supported.`
       );
     }
 
     // Read file content
     let content: string;
     try {
-      content = fs.readFileSync(filePath, "utf-8");
+      content = fs.readFileSync(filePath, 'utf-8');
     } catch (error) {
       throw new Error(`Failed to read file ${filePath}: ${error}`);
     }
@@ -68,22 +68,21 @@ export class CodeAnalyzer {
    * @returns Parsed AST
    */
   private parseFile(content: string, extension: string): any {
-    const isTypeScript = extension === ".ts" || extension === ".tsx";
-    const isJSX =
-      extension === ".jsx" || extension === ".tsx" || extension === ".js";
+    const isTypeScript = extension === '.ts' || extension === '.tsx';
+    const isJSX = extension === '.jsx' || extension === '.tsx' || extension === '.js';
 
     const plugins: parser.ParserPlugin[] = [];
 
     if (isTypeScript) {
-      plugins.push("typescript");
+      plugins.push('typescript');
     }
 
     if (isJSX) {
-      plugins.push("jsx");
+      plugins.push('jsx');
     }
 
     return parser.parse(content, {
-      sourceType: "module",
+      sourceType: 'module',
       plugins: plugins,
       // Allow various modern JavaScript features
       allowImportExportEverywhere: true,
@@ -113,12 +112,12 @@ export class CodeAnalyzer {
     if (ast.program && ast.program.body) {
       for (const node of ast.program.body) {
         // Extract imports for context
-        if (node.type === "ImportDeclaration") {
+        if (node.type === 'ImportDeclaration') {
           context.imports?.push(node.source.value);
         }
 
         // Function declarations
-        if (node.type === "FunctionDeclaration" && node.id) {
+        if (node.type === 'FunctionDeclaration' && node.id) {
           const signature = this.extractFunctionSignature(node);
           elements.push({
             type: CodeElementType.FUNCTION,
@@ -131,7 +130,7 @@ export class CodeAnalyzer {
         }
 
         // Class declarations
-        if (node.type === "ClassDeclaration" && node.id) {
+        if (node.type === 'ClassDeclaration' && node.id) {
           elements.push({
             type: CodeElementType.CLASS,
             name: node.id.name,
@@ -143,7 +142,7 @@ export class CodeAnalyzer {
           // Extract methods from class
           if (node.body && node.body.body) {
             for (const member of node.body.body) {
-              if (member.type === "ClassMethod" && member.key) {
+              if (member.type === 'ClassMethod' && member.key) {
                 const methodName = member.key.name || member.key.value;
                 const signature = this.extractFunctionSignature(member);
                 elements.push({
@@ -160,16 +159,15 @@ export class CodeAnalyzer {
         }
 
         // Variable declarations with function expressions or arrow functions
-        if (node.type === "VariableDeclaration") {
+        if (node.type === 'VariableDeclaration') {
           for (const declaration of node.declarations) {
-            if (declaration.id && declaration.id.type === "Identifier") {
+            if (declaration.id && declaration.id.type === 'Identifier') {
               const init = declaration.init;
 
               // Arrow functions or function expressions
               if (
                 init &&
-                (init.type === "ArrowFunctionExpression" ||
-                  init.type === "FunctionExpression")
+                (init.type === 'ArrowFunctionExpression' || init.type === 'FunctionExpression')
               ) {
                 const signature = this.extractFunctionSignature(init);
                 elements.push({
@@ -186,16 +184,10 @@ export class CodeAnalyzer {
         }
 
         // Export declarations
-        if (
-          node.type === "ExportNamedDeclaration" ||
-          node.type === "ExportDefaultDeclaration"
-        ) {
+        if (node.type === 'ExportNamedDeclaration' || node.type === 'ExportDefaultDeclaration') {
           if (node.declaration) {
             // Handle exported function declarations
-            if (
-              node.declaration.type === "FunctionDeclaration" &&
-              node.declaration.id
-            ) {
+            if (node.declaration.type === 'FunctionDeclaration' && node.declaration.id) {
               const signature = this.extractFunctionSignature(node.declaration);
               elements.push({
                 type: CodeElementType.FUNCTION,
@@ -208,10 +200,7 @@ export class CodeAnalyzer {
             }
 
             // Handle exported class declarations
-            if (
-              node.declaration.type === "ClassDeclaration" &&
-              node.declaration.id
-            ) {
+            if (node.declaration.type === 'ClassDeclaration' && node.declaration.id) {
               elements.push({
                 type: CodeElementType.CLASS,
                 name: node.declaration.id.name,
@@ -239,7 +228,7 @@ export class CodeAnalyzer {
    */
   extractFunctionSignature(node: any): FunctionSignature {
     // Determine function name
-    let name = "anonymous";
+    let name = 'anonymous';
     if (node.id && node.id.name) {
       name = node.id.name;
     } else if (node.key && node.key.name) {
@@ -287,13 +276,13 @@ export class CodeAnalyzer {
    * @returns Parameter object with name, type, optional flag, and default value
    */
   private extractParameter(param: any): Parameter {
-    let name = "unknown";
+    let name = 'unknown';
     let type: string | undefined;
     let optional = false;
     let defaultValue: string | undefined;
 
     // Handle different parameter patterns
-    if (param.type === "Identifier") {
+    if (param.type === 'Identifier') {
       name = param.name;
 
       // Check for type annotation (TypeScript)
@@ -303,9 +292,9 @@ export class CodeAnalyzer {
 
       // Check if optional (TypeScript)
       optional = param.optional === true;
-    } else if (param.type === "AssignmentPattern") {
+    } else if (param.type === 'AssignmentPattern') {
       // Parameter with default value
-      if (param.left.type === "Identifier") {
+      if (param.left.type === 'Identifier') {
         name = param.left.name;
 
         if (param.left.typeAnnotation) {
@@ -317,9 +306,9 @@ export class CodeAnalyzer {
 
       // Extract default value
       defaultValue = this.extractDefaultValue(param.right);
-    } else if (param.type === "RestElement") {
+    } else if (param.type === 'RestElement') {
       // Rest parameter (...args)
-      if (param.argument.type === "Identifier") {
+      if (param.argument.type === 'Identifier') {
         name = `...${param.argument.name}`;
 
         // Extract type from the argument's type annotation
@@ -329,16 +318,16 @@ export class CodeAnalyzer {
           type = this.extractTypeAnnotation(param.typeAnnotation);
         }
       }
-    } else if (param.type === "ObjectPattern") {
+    } else if (param.type === 'ObjectPattern') {
       // Destructured object parameter
-      name = "{destructured}";
+      name = '{destructured}';
 
       if (param.typeAnnotation) {
         type = this.extractTypeAnnotation(param.typeAnnotation);
       }
-    } else if (param.type === "ArrayPattern") {
+    } else if (param.type === 'ArrayPattern') {
       // Destructured array parameter
-      name = "[destructured]";
+      name = '[destructured]';
 
       if (param.typeAnnotation) {
         type = this.extractTypeAnnotation(param.typeAnnotation);
@@ -367,60 +356,56 @@ export class CodeAnalyzer {
    */
   private extractTypeAnnotation(typeAnnotation: any): string {
     if (!typeAnnotation) {
-      return "any";
+      return 'any';
     }
 
     // Handle TSTypeAnnotation wrapper
     const typeNode = typeAnnotation.typeAnnotation || typeAnnotation;
 
     switch (typeNode.type) {
-      case "TSStringKeyword":
-        return "string";
-      case "TSNumberKeyword":
-        return "number";
-      case "TSBooleanKeyword":
-        return "boolean";
-      case "TSAnyKeyword":
-        return "any";
-      case "TSVoidKeyword":
-        return "void";
-      case "TSNullKeyword":
-        return "null";
-      case "TSUndefinedKeyword":
-        return "undefined";
-      case "TSUnknownKeyword":
-        return "unknown";
-      case "TSNeverKeyword":
-        return "never";
-      case "TSObjectKeyword":
-        return "object";
-      case "TSArrayType":
+      case 'TSStringKeyword':
+        return 'string';
+      case 'TSNumberKeyword':
+        return 'number';
+      case 'TSBooleanKeyword':
+        return 'boolean';
+      case 'TSAnyKeyword':
+        return 'any';
+      case 'TSVoidKeyword':
+        return 'void';
+      case 'TSNullKeyword':
+        return 'null';
+      case 'TSUndefinedKeyword':
+        return 'undefined';
+      case 'TSUnknownKeyword':
+        return 'unknown';
+      case 'TSNeverKeyword':
+        return 'never';
+      case 'TSObjectKeyword':
+        return 'object';
+      case 'TSArrayType':
         return `${this.extractTypeAnnotation(typeNode.elementType)}[]`;
-      case "TSTypeReference":
+      case 'TSTypeReference':
         if (typeNode.typeName && typeNode.typeName.name) {
           return typeNode.typeName.name;
         }
-        return "unknown";
-      case "TSUnionType":
+        return 'unknown';
+      case 'TSUnionType':
         if (typeNode.types) {
-          return typeNode.types
-            .map((t: any) => this.extractTypeAnnotation(t))
-            .join(" | ");
+          return typeNode.types.map((t: any) => this.extractTypeAnnotation(t)).join(' | ');
         }
-        return "unknown";
-      case "TSIntersectionType":
+        return 'unknown';
+      case 'TSIntersectionType':
         if (typeNode.types) {
-          return typeNode.types
-            .map((t: any) => this.extractTypeAnnotation(t))
-            .join(" & ");
+          return typeNode.types.map((t: any) => this.extractTypeAnnotation(t)).join(' & ');
         }
-        return "unknown";
-      case "TSFunctionType":
-        return "Function";
-      case "TSTypeLiteral":
-        return "object";
+        return 'unknown';
+      case 'TSFunctionType':
+        return 'Function';
+      case 'TSTypeLiteral':
+        return 'object';
       default:
-        return "any";
+        return 'any';
     }
   }
 
@@ -432,31 +417,31 @@ export class CodeAnalyzer {
    */
   private extractDefaultValue(node: any): string {
     if (!node) {
-      return "undefined";
+      return 'undefined';
     }
 
     switch (node.type) {
-      case "StringLiteral":
+      case 'StringLiteral':
         return `"${node.value}"`;
-      case "NumericLiteral":
+      case 'NumericLiteral':
         return String(node.value);
-      case "BooleanLiteral":
+      case 'BooleanLiteral':
         return String(node.value);
-      case "NullLiteral":
-        return "null";
-      case "Identifier":
+      case 'NullLiteral':
+        return 'null';
+      case 'Identifier':
         return node.name;
-      case "ArrayExpression":
-        return "[]";
-      case "ObjectExpression":
-        return "{}";
-      case "UnaryExpression":
-        if (node.operator === "-" && node.argument.type === "NumericLiteral") {
+      case 'ArrayExpression':
+        return '[]';
+      case 'ObjectExpression':
+        return '{}';
+      case 'UnaryExpression':
+        if (node.operator === '-' && node.argument.type === 'NumericLiteral') {
           return `-${node.argument.value}`;
         }
-        return "undefined";
+        return 'undefined';
       default:
-        return "undefined";
+        return 'undefined';
     }
   }
 
@@ -476,23 +461,23 @@ export class CodeAnalyzer {
     // Check if this is an expression statement containing a call expression
     let callExpression = node;
 
-    if (node.type === "ExpressionStatement" && node.expression) {
+    if (node.type === 'ExpressionStatement' && node.expression) {
       callExpression = node.expression;
     }
 
-    if (callExpression.type !== "CallExpression") {
+    if (callExpression.type !== 'CallExpression') {
       return null;
     }
 
     // Check if the callee is a member expression (e.g., app.get, router.post)
     const callee = callExpression.callee;
-    if (callee.type !== "MemberExpression") {
+    if (callee.type !== 'MemberExpression') {
       return null;
     }
 
     // Extract the object name (app, router, etc.)
     const objectName = callee.object?.name;
-    if (!objectName || !["app", "router"].includes(objectName)) {
+    if (!objectName || !['app', 'router'].includes(objectName)) {
       return null;
     }
 
@@ -523,14 +508,11 @@ export class CodeAnalyzer {
     }
 
     // Extract path (first argument)
-    let path = "/";
+    let path = '/';
     const firstArg = args[0];
-    if (firstArg.type === "StringLiteral") {
+    if (firstArg.type === 'StringLiteral') {
       path = firstArg.value;
-    } else if (
-      firstArg.type === "TemplateLiteral" &&
-      firstArg.quasis.length === 1
-    ) {
+    } else if (firstArg.type === 'TemplateLiteral' && firstArg.quasis.length === 1) {
       path = firstArg.quasis[0].value.raw;
     }
 
@@ -542,37 +524,30 @@ export class CodeAnalyzer {
       const arg = args[i];
 
       // Identifier (named function or middleware)
-      if (arg.type === "Identifier") {
+      if (arg.type === 'Identifier') {
         middleware.push(arg.name);
 
         // Check for authentication middleware patterns
         const name = arg.name.toLowerCase();
-        if (
-          name.includes("auth") ||
-          name.includes("authenticate") ||
-          name.includes("protected")
-        ) {
+        if (name.includes('auth') || name.includes('authenticate') || name.includes('protected')) {
           requiresAuth = true;
         }
       }
       // Arrow function or function expression (inline handler)
-      else if (
-        arg.type === "ArrowFunctionExpression" ||
-        arg.type === "FunctionExpression"
-      ) {
-        middleware.push("(inline handler)");
+      else if (arg.type === 'ArrowFunctionExpression' || arg.type === 'FunctionExpression') {
+        middleware.push('(inline handler)');
       }
       // Array of middleware
-      else if (arg.type === "ArrayExpression" && arg.elements) {
+      else if (arg.type === 'ArrayExpression' && arg.elements) {
         for (const element of arg.elements) {
-          if (element && element.type === "Identifier") {
+          if (element && element.type === 'Identifier') {
             middleware.push(element.name);
 
             const name = element.name.toLowerCase();
             if (
-              name.includes("auth") ||
-              name.includes("authenticate") ||
-              name.includes("protected")
+              name.includes('auth') ||
+              name.includes('authenticate') ||
+              name.includes('protected')
             ) {
               requiresAuth = true;
             }

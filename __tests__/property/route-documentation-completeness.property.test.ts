@@ -11,42 +11,39 @@
  * authentication requirements, and any side effects.
  */
 
-import * as fc from "fast-check";
-import { generateRouteDoc } from "../../src/generators/RouteDocGenerator";
-import { RouteInfo, ResponseSpec, HTTPMethod } from "../../src/types";
+import * as fc from 'fast-check';
+import { generateRouteDoc } from '../../src/generators/RouteDocGenerator';
+import { RouteInfo, ResponseSpec, HTTPMethod } from '../../src/types';
 
-describe("Property 2: API Route Documentation Completeness", () => {
+describe('Property 2: API Route Documentation Completeness', () => {
   // Arbitrary for HTTP methods
   const httpMethodArb = fc.constantFrom(
     HTTPMethod.GET,
     HTTPMethod.POST,
     HTTPMethod.PUT,
     HTTPMethod.PATCH,
-    HTTPMethod.DELETE,
+    HTTPMethod.DELETE
   );
 
   // Arbitrary for API paths
   const pathSegmentArb = fc.oneof(
-    fc.constantFrom("users", "posts", "comments", "products", "orders"),
-    fc.string({ minLength: 1, maxLength: 10 }).map((s) => `:${s}`),
+    fc.constantFrom('users', 'posts', 'comments', 'products', 'orders'),
+    fc.string({ minLength: 1, maxLength: 10 }).map((s) => `:${s}`)
   );
 
   const pathArb = fc
     .array(pathSegmentArb, { minLength: 1, maxLength: 4 })
-    .map((segments) => "/" + segments.join("/"));
+    .map((segments) => '/' + segments.join('/'));
 
   // Arbitrary for middleware
   const middlewareArb = fc.array(
-    fc.constantFrom("authenticate", "authorize", "validate", "rateLimit"),
-    { maxLength: 3 },
+    fc.constantFrom('authenticate', 'authorize', 'validate', 'rateLimit'),
+    { maxLength: 3 }
   );
 
   // Arbitrary for response specs
   const responseSpecArb: fc.Arbitrary<ResponseSpec> = fc.record({
-    statusCode: fc.oneof(
-      fc.constantFrom(200, 201, 204),
-      fc.constantFrom(400, 401, 403, 404, 500),
-    ),
+    statusCode: fc.oneof(fc.constantFrom(200, 201, 204), fc.constantFrom(400, 401, 403, 404, 500)),
     description: fc.string({ minLength: 5, maxLength: 50 }),
     schema: fc.option(fc.object(), { nil: undefined }),
   });
@@ -72,7 +69,7 @@ describe("Property 2: API Route Documentation Completeness", () => {
     responses: fc.array(responseSpecArb, { minLength: 1, maxLength: 5 }),
   });
 
-  it("should always generate a description for any route", () => {
+  it('should always generate a description for any route', () => {
     fc.assert(
       fc.property(routeInfoArb, (routeInfo) => {
         const jsdoc = generateRouteDoc(routeInfo);
@@ -81,11 +78,11 @@ describe("Property 2: API Route Documentation Completeness", () => {
         expect(jsdoc.description).toBeDefined();
         expect(jsdoc.description.length).toBeGreaterThan(0);
       }),
-      { numRuns: 100 },
+      { numRuns: 100 }
     );
   });
 
-  it("should always document request and response parameters", () => {
+  it('should always document request and response parameters', () => {
     fc.assert(
       fc.property(routeInfoArb, (routeInfo) => {
         const jsdoc = generateRouteDoc(routeInfo);
@@ -95,14 +92,14 @@ describe("Property 2: API Route Documentation Completeness", () => {
         expect(jsdoc.params!.length).toBeGreaterThanOrEqual(2);
 
         const paramNames = jsdoc.params!.map((p) => p.name);
-        expect(paramNames).toContain("req");
-        expect(paramNames).toContain("res");
+        expect(paramNames).toContain('req');
+        expect(paramNames).toContain('res');
       }),
-      { numRuns: 100 },
+      { numRuns: 100 }
     );
   });
 
-  it("should document authentication requirements in tags", () => {
+  it('should document authentication requirements in tags', () => {
     fc.assert(
       fc.property(routeInfoArb, (routeInfo) => {
         const jsdoc = generateRouteDoc(routeInfo);
@@ -112,16 +109,16 @@ describe("Property 2: API Route Documentation Completeness", () => {
         expect(jsdoc.tags!.access).toBeDefined();
 
         if (routeInfo.requiresAuth) {
-          expect(jsdoc.tags!.access).toBe("protected");
+          expect(jsdoc.tags!.access).toBe('protected');
         } else {
-          expect(jsdoc.tags!.access).toBe("public");
+          expect(jsdoc.tags!.access).toBe('public');
         }
       }),
-      { numRuns: 100 },
+      { numRuns: 100 }
     );
   });
 
-  it("should document the route method and path", () => {
+  it('should document the route method and path', () => {
     fc.assert(
       fc.property(routeInfoArb, (routeInfo) => {
         const jsdoc = generateRouteDoc(routeInfo);
@@ -132,11 +129,11 @@ describe("Property 2: API Route Documentation Completeness", () => {
         expect(jsdoc.tags!.route).toContain(routeInfo.method);
         expect(jsdoc.tags!.route).toContain(routeInfo.path);
       }),
-      { numRuns: 100 },
+      { numRuns: 100 }
     );
   });
 
-  it("should document response codes and descriptions", () => {
+  it('should document response codes and descriptions', () => {
     fc.assert(
       fc.property(routeInfoArb, (routeInfo) => {
         const jsdoc = generateRouteDoc(routeInfo);
@@ -147,30 +144,28 @@ describe("Property 2: API Route Documentation Completeness", () => {
         expect(jsdoc.returns!.description).toBeDefined();
         expect(jsdoc.returns!.description.length).toBeGreaterThan(0);
       }),
-      { numRuns: 100 },
+      { numRuns: 100 }
     );
   });
 
-  it("should document error responses as throws", () => {
+  it('should document error responses as throws', () => {
     fc.assert(
       fc.property(routeInfoArb, (routeInfo) => {
         const jsdoc = generateRouteDoc(routeInfo);
 
         // Property: Error responses (4xx, 5xx) should be documented in throws
-        const errorResponses = routeInfo.responses.filter(
-          (r) => r.statusCode >= 400,
-        );
+        const errorResponses = routeInfo.responses.filter((r) => r.statusCode >= 400);
 
         if (errorResponses.length > 0) {
           expect(jsdoc.throws).toBeDefined();
           expect(jsdoc.throws!.length).toBeGreaterThan(0);
         }
       }),
-      { numRuns: 100 },
+      { numRuns: 100 }
     );
   });
 
-  it("should include next parameter when middleware is present", () => {
+  it('should include next parameter when middleware is present', () => {
     fc.assert(
       fc.property(routeInfoArb, (routeInfo) => {
         const jsdoc = generateRouteDoc(routeInfo);
@@ -178,41 +173,40 @@ describe("Property 2: API Route Documentation Completeness", () => {
         // Property: If middleware exists, next parameter should be documented
         if (routeInfo.middleware && routeInfo.middleware.length > 0) {
           const paramNames = jsdoc.params!.map((p) => p.name);
-          expect(paramNames).toContain("next");
+          expect(paramNames).toContain('next');
         }
       }),
-      { numRuns: 100 },
+      { numRuns: 100 }
     );
   });
 
-  it("should generate examples when request/response data is available", () => {
+  it('should generate examples when request/response data is available', () => {
     fc.assert(
       fc.property(routeInfoArb, (routeInfo) => {
         const jsdoc = generateRouteDoc(routeInfo);
 
         // Helper to check if an object has meaningful content
         const hasKeys = (obj: any): boolean => {
-          return obj && typeof obj === "object" && Object.keys(obj).length > 0;
+          return obj && typeof obj === 'object' && Object.keys(obj).length > 0;
         };
 
         // Property: Example should be present if we have meaningful body or success response schema
         const hasBody = hasKeys(routeInfo.requestParams?.body);
         const successResponse = routeInfo.responses.find(
-          (r) => r.statusCode >= 200 && r.statusCode < 300,
+          (r) => r.statusCode >= 200 && r.statusCode < 300
         );
-        const hasResponseSchema =
-          successResponse && hasKeys(successResponse.schema);
+        const hasResponseSchema = successResponse && hasKeys(successResponse.schema);
 
         if (hasBody || hasResponseSchema) {
           expect(jsdoc.example).toBeDefined();
           expect(jsdoc.example!.length).toBeGreaterThan(0);
         }
       }),
-      { numRuns: 100 },
+      { numRuns: 100 }
     );
   });
 
-  it("should maintain consistency between route info and generated docs", () => {
+  it('should maintain consistency between route info and generated docs', () => {
     fc.assert(
       fc.property(routeInfoArb, (routeInfo) => {
         const jsdoc = generateRouteDoc(routeInfo);
@@ -225,14 +219,12 @@ describe("Property 2: API Route Documentation Completeness", () => {
 
         if (jsdoc.throws) {
           for (const statusCode of errorStatusCodes) {
-            const documented = jsdoc.throws.some((t) =>
-              t.type.includes(statusCode.toString()),
-            );
+            const documented = jsdoc.throws.some((t) => t.type.includes(statusCode.toString()));
             expect(documented).toBe(true);
           }
         }
       }),
-      { numRuns: 100 },
+      { numRuns: 100 }
     );
   });
 });
