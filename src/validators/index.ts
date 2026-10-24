@@ -5,9 +5,5 @@
  * quality standards, checking syntax, completeness, and consistency.
  */
 
-export {
-  DocumentationValidator,
-  Glossary,
-  TerminologyIssue,
-  ValidationIssue,
-} from './DocumentationValidator.js';
+export { DocumentationValidator } from './DocumentationValidator.js';
+export type { Glossary, TerminologyIssue, ValidationIssue } from './DocumentationValidator.js';

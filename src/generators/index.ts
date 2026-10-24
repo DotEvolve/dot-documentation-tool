@@ -7,9 +7,5 @@
 
 export { generateJSDoc, formatJSDoc } from './JSDocGenerator.js';
 export { generateRouteDoc } from './RouteDocGenerator.js';
-export {
-  generateInlineComments,
-  detectBusinessRules,
-  InlineComment,
-  BusinessRule,
-} from './InlineCommentGenerator.js';
+export { generateInlineComments, detectBusinessRules } from './InlineCommentGenerator.js';
+export type { InlineComment, BusinessRule } from './InlineCommentGenerator.js';
