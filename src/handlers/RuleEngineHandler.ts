@@ -5,7 +5,7 @@
  * Handles RabbitMQ integration, webhook payload validation, message queue patterns, and retry logic.
  */
 
-import { CodeElement, JSDoc, ParamDoc, ThrowsDoc } from "../types";
+import { CodeElement, JSDoc, ParamDoc, ThrowsDoc } from '../types.js';
 
 /**
  * Generates specialized documentation for Rule Engine Service components
@@ -52,11 +52,11 @@ export function generateRuleEngineDoc(element: CodeElement): JSDoc {
 function isRabbitMQOperation(element: CodeElement): boolean {
   const name = element.name.toLowerCase();
   return (
-    name.includes("rabbitmq") ||
-    name.includes("amqp") ||
-    name.includes("queue") ||
-    name.includes("publish") ||
-    name.includes("consume")
+    name.includes('rabbitmq') ||
+    name.includes('amqp') ||
+    name.includes('queue') ||
+    name.includes('publish') ||
+    name.includes('consume')
   );
 }
 
@@ -69,14 +69,10 @@ function isRabbitMQOperation(element: CodeElement): boolean {
 function isWebhookHandler(element: CodeElement): boolean {
   const name = element.name.toLowerCase();
   // Don't match validation functions
-  if (name.includes("validate") || name.includes("verify")) {
+  if (name.includes('validate') || name.includes('verify')) {
     return false;
   }
-  return (
-    name.includes("webhook") ||
-    name.includes("callback") ||
-    name.includes("event")
-  );
+  return name.includes('webhook') || name.includes('callback') || name.includes('event');
 }
 
 /**
@@ -88,10 +84,10 @@ function isWebhookHandler(element: CodeElement): boolean {
 function isMessageQueuePattern(element: CodeElement): boolean {
   const name = element.name.toLowerCase();
   return (
-    name.includes("message") ||
-    name.includes("producer") ||
-    name.includes("consumer") ||
-    name.includes("subscriber")
+    name.includes('message') ||
+    name.includes('producer') ||
+    name.includes('consumer') ||
+    name.includes('subscriber')
   );
 }
 
@@ -103,11 +99,7 @@ function isMessageQueuePattern(element: CodeElement): boolean {
  */
 function isRetryLogic(element: CodeElement): boolean {
   const name = element.name.toLowerCase();
-  return (
-    name.includes("retry") ||
-    name.includes("backoff") ||
-    name.includes("attempt")
-  );
+  return name.includes('retry') || name.includes('backoff') || name.includes('attempt');
 }
 
 /**
@@ -119,10 +111,10 @@ function isRetryLogic(element: CodeElement): boolean {
 function isPayloadValidation(element: CodeElement): boolean {
   const name = element.name.toLowerCase();
   return (
-    name.includes("validate") ||
-    name.includes("payload") ||
-    name.includes("schema") ||
-    name.includes("verify")
+    name.includes('validate') ||
+    name.includes('payload') ||
+    name.includes('schema') ||
+    name.includes('verify')
   );
 }
 
@@ -136,23 +128,23 @@ function generateRabbitMQDoc(element: CodeElement): JSDoc {
   const params: ParamDoc[] =
     element.signature?.parameters.map((p) => ({
       name: p.name,
-      type: p.type || "any",
-      description: `${p.name} - ${p.name.includes("message") ? "Message data to publish/consume" : "RabbitMQ operation parameter"}`,
+      type: p.type || 'any',
+      description: `${p.name} - ${p.name.includes('message') ? 'Message data to publish/consume' : 'RabbitMQ operation parameter'}`,
       optional: p.optional,
     })) || [];
 
   const throws: ThrowsDoc[] = [
     {
-      type: "AMQPConnectionError",
-      condition: "When connection to RabbitMQ server fails",
+      type: 'AMQPConnectionError',
+      condition: 'When connection to RabbitMQ server fails',
     },
     {
-      type: "AMQPChannelError",
-      condition: "When channel operation fails",
+      type: 'AMQPChannelError',
+      condition: 'When channel operation fails',
     },
     {
-      type: "MessagePublishError",
-      condition: "When message cannot be published to queue",
+      type: 'MessagePublishError',
+      condition: 'When message cannot be published to queue',
     },
   ];
 
@@ -160,14 +152,14 @@ function generateRabbitMQDoc(element: CodeElement): JSDoc {
     description: `RabbitMQ message queue operation. Handles asynchronous message publishing and consumption for reliable inter-service communication. Ensures message delivery with acknowledgments and dead-letter queues for failed messages.`,
     params,
     returns: {
-      type: element.signature?.returnType || "Promise<void>",
-      description: "Operation completes when message is published/consumed",
+      type: element.signature?.returnType || 'Promise<void>',
+      description: 'Operation completes when message is published/consumed',
     },
     throws,
     tags: {
-      messaging: "rabbitmq",
-      pattern: "async",
-      reliability: "guaranteed-delivery",
+      messaging: 'rabbitmq',
+      pattern: 'async',
+      reliability: 'guaranteed-delivery',
     },
   };
 }
@@ -181,15 +173,14 @@ function generateRabbitMQDoc(element: CodeElement): JSDoc {
 function generateWebhookDoc(_element: CodeElement): JSDoc {
   const params: ParamDoc[] = [
     {
-      name: "req",
-      type: "express.Request",
-      description:
-        "Webhook request containing event payload from external system",
+      name: 'req',
+      type: 'express.Request',
+      description: 'Webhook request containing event payload from external system',
     },
     {
-      name: "res",
-      type: "express.Response",
-      description: "Response to acknowledge webhook receipt",
+      name: 'res',
+      type: 'express.Response',
+      description: 'Response to acknowledge webhook receipt',
     },
   ];
 
@@ -197,24 +188,23 @@ function generateWebhookDoc(_element: CodeElement): JSDoc {
     description: `Webhook endpoint handler that receives and processes events from external ERP systems. Validates webhook signatures, parses payloads, and triggers appropriate business logic. Implements idempotency to handle duplicate webhook deliveries.`,
     params,
     returns: {
-      type: "Promise<void>",
-      description: "Sends 200 OK response after processing webhook",
+      type: 'Promise<void>',
+      description: 'Sends 200 OK response after processing webhook',
     },
     throws: [
       {
-        type: "HTTP400",
-        condition:
-          "When webhook payload is invalid or signature verification fails",
+        type: 'HTTP400',
+        condition: 'When webhook payload is invalid or signature verification fails',
       },
       {
-        type: "HTTP500",
-        condition: "When webhook processing fails internally",
+        type: 'HTTP500',
+        condition: 'When webhook processing fails internally',
       },
     ],
     tags: {
-      integration: "webhook",
-      external: "erp-system",
-      idempotent: "true",
+      integration: 'webhook',
+      external: 'erp-system',
+      idempotent: 'true',
     },
   };
 }
@@ -229,7 +219,7 @@ function generateMessageQueueDoc(element: CodeElement): JSDoc {
   const params: ParamDoc[] =
     element.signature?.parameters.map((p) => ({
       name: p.name,
-      type: p.type || "any",
+      type: p.type || 'any',
       description: `${p.name} - Message queue operation parameter`,
       optional: p.optional,
     })) || [];
@@ -238,19 +228,19 @@ function generateMessageQueueDoc(element: CodeElement): JSDoc {
     description: `Message queue pattern implementation for asynchronous task processing. Decouples producers and consumers, enables load balancing, and provides fault tolerance. Messages are persisted until successfully processed.`,
     params,
     returns: {
-      type: element.signature?.returnType || "Promise<void>",
-      description: "Message queue operation result",
+      type: element.signature?.returnType || 'Promise<void>',
+      description: 'Message queue operation result',
     },
     throws: [
       {
-        type: "QueueError",
-        condition: "When queue operation fails",
+        type: 'QueueError',
+        condition: 'When queue operation fails',
       },
     ],
     tags: {
-      pattern: "message-queue",
-      async: "true",
-      scalable: "true",
+      pattern: 'message-queue',
+      async: 'true',
+      scalable: 'true',
     },
   };
 }
@@ -265,8 +255,8 @@ function generateRetryLogicDoc(element: CodeElement): JSDoc {
   const params: ParamDoc[] =
     element.signature?.parameters.map((p) => ({
       name: p.name,
-      type: p.type || "any",
-      description: `${p.name} - ${p.name.includes("attempt") ? "Current retry attempt number" : "Retry operation parameter"}`,
+      type: p.type || 'any',
+      description: `${p.name} - ${p.name.includes('attempt') ? 'Current retry attempt number' : 'Retry operation parameter'}`,
       optional: p.optional,
     })) || [];
 
@@ -274,23 +264,23 @@ function generateRetryLogicDoc(element: CodeElement): JSDoc {
     description: `Retry logic with exponential backoff for handling transient failures. Automatically retries failed operations with increasing delays between attempts. Implements circuit breaker pattern to prevent cascading failures. Logs retry attempts for monitoring and debugging.`,
     params,
     returns: {
-      type: element.signature?.returnType || "Promise<any>",
-      description: "Result of successful operation after retries",
+      type: element.signature?.returnType || 'Promise<any>',
+      description: 'Result of successful operation after retries',
     },
     throws: [
       {
-        type: "MaxRetriesExceededError",
-        condition: "When all retry attempts are exhausted",
+        type: 'MaxRetriesExceededError',
+        condition: 'When all retry attempts are exhausted',
       },
       {
-        type: "CircuitBreakerOpenError",
-        condition: "When circuit breaker is open due to repeated failures",
+        type: 'CircuitBreakerOpenError',
+        condition: 'When circuit breaker is open due to repeated failures',
       },
     ],
     tags: {
-      pattern: "retry",
-      strategy: "exponential-backoff",
-      resilience: "circuit-breaker",
+      pattern: 'retry',
+      strategy: 'exponential-backoff',
+      resilience: 'circuit-breaker',
     },
   };
 }
@@ -305,8 +295,8 @@ function generatePayloadValidationDoc(element: CodeElement): JSDoc {
   const params: ParamDoc[] =
     element.signature?.parameters.map((p) => ({
       name: p.name,
-      type: p.type || "any",
-      description: `${p.name} - ${p.name.includes("payload") ? "Payload data to validate" : "Validation parameter"}`,
+      type: p.type || 'any',
+      description: `${p.name} - ${p.name.includes('payload') ? 'Payload data to validate' : 'Validation parameter'}`,
       optional: p.optional,
     })) || [];
 
@@ -314,23 +304,23 @@ function generatePayloadValidationDoc(element: CodeElement): JSDoc {
     description: `Webhook payload validation function that verifies incoming data structure, types, and business rules. Validates against JSON schemas, checks required fields, and ensures data integrity. Prevents processing of malformed or malicious payloads.`,
     params,
     returns: {
-      type: element.signature?.returnType || "ValidationResult",
-      description: "Validation result with errors if payload is invalid",
+      type: element.signature?.returnType || 'ValidationResult',
+      description: 'Validation result with errors if payload is invalid',
     },
     throws: [
       {
-        type: "ValidationError",
-        condition: "When payload fails schema validation",
+        type: 'ValidationError',
+        condition: 'When payload fails schema validation',
       },
       {
-        type: "SecurityError",
-        condition: "When payload contains suspicious or malicious content",
+        type: 'SecurityError',
+        condition: 'When payload contains suspicious or malicious content',
       },
     ],
     tags: {
-      validation: "schema",
-      security: "input-validation",
-      critical: "true",
+      validation: 'schema',
+      security: 'input-validation',
+      critical: 'true',
     },
   };
 }
@@ -347,13 +337,13 @@ function generateDefaultDoc(element: CodeElement): JSDoc {
     params:
       element.signature?.parameters.map((p) => ({
         name: p.name,
-        type: p.type || "any",
+        type: p.type || 'any',
         description: `Parameter ${p.name}`,
         optional: p.optional,
       })) || [],
     returns: {
-      type: element.signature?.returnType || "void",
-      description: "Function return value",
+      type: element.signature?.returnType || 'void',
+      description: 'Function return value',
     },
   };
 }

@@ -5,7 +5,7 @@
  * Handles Prisma models, business logic, compliance rules, PDF generation, and audit logging.
  */
 
-import { CodeElement, JSDoc, ParamDoc, ThrowsDoc } from "../types";
+import { CodeElement, JSDoc, ParamDoc, ThrowsDoc } from '../types.js';
 
 /**
  * Generates specialized documentation for Workflow Service components
@@ -52,12 +52,12 @@ export function generateWorkflowServiceDoc(element: CodeElement): JSDoc {
 function isPrismaOperation(element: CodeElement): boolean {
   const name = element.name.toLowerCase();
   return (
-    name.includes("prisma") ||
-    name.includes("create") ||
-    name.includes("update") ||
-    name.includes("delete") ||
-    name.includes("find") ||
-    name.includes("query")
+    name.includes('prisma') ||
+    name.includes('create') ||
+    name.includes('update') ||
+    name.includes('delete') ||
+    name.includes('find') ||
+    name.includes('query')
   );
 }
 
@@ -70,11 +70,11 @@ function isPrismaOperation(element: CodeElement): boolean {
 function isBusinessLogic(element: CodeElement): boolean {
   const name = element.name.toLowerCase();
   return (
-    name.includes("workflow") ||
-    name.includes("process") ||
-    name.includes("validate") ||
-    name.includes("calculate") ||
-    name.includes("rule")
+    name.includes('workflow') ||
+    name.includes('process') ||
+    name.includes('validate') ||
+    name.includes('calculate') ||
+    name.includes('rule')
   );
 }
 
@@ -87,10 +87,10 @@ function isBusinessLogic(element: CodeElement): boolean {
 function isPDFGeneration(element: CodeElement): boolean {
   const name = element.name.toLowerCase();
   return (
-    name.includes("pdf") ||
-    name.includes("generate") ||
-    name.includes("document") ||
-    name.includes("report")
+    name.includes('pdf') ||
+    name.includes('generate') ||
+    name.includes('document') ||
+    name.includes('report')
   );
 }
 
@@ -103,10 +103,10 @@ function isPDFGeneration(element: CodeElement): boolean {
 function isAuditLogging(element: CodeElement): boolean {
   const name = element.name.toLowerCase();
   return (
-    name.includes("audit") ||
-    name.includes("log") ||
-    name.includes("track") ||
-    name.includes("history")
+    name.includes('audit') ||
+    name.includes('log') ||
+    name.includes('track') ||
+    name.includes('history')
   );
 }
 
@@ -119,10 +119,10 @@ function isAuditLogging(element: CodeElement): boolean {
 function isComplianceValidation(element: CodeElement): boolean {
   const name = element.name.toLowerCase();
   return (
-    name.includes("compliance") ||
-    name.includes("regulation") ||
-    name.includes("policy") ||
-    name.includes("requirement")
+    name.includes('compliance') ||
+    name.includes('regulation') ||
+    name.includes('policy') ||
+    name.includes('requirement')
   );
 }
 
@@ -136,20 +136,19 @@ function generatePrismaOperationDoc(element: CodeElement): JSDoc {
   const params: ParamDoc[] =
     element.signature?.parameters.map((p) => ({
       name: p.name,
-      type: p.type || "any",
+      type: p.type || 'any',
       description: `${p.name} - Data for database operation`,
       optional: p.optional,
     })) || [];
 
   const throws: ThrowsDoc[] = [
     {
-      type: "PrismaClientKnownRequestError",
-      condition:
-        "When database constraint is violated (unique, foreign key, etc.)",
+      type: 'PrismaClientKnownRequestError',
+      condition: 'When database constraint is violated (unique, foreign key, etc.)',
     },
     {
-      type: "PrismaClientValidationError",
-      condition: "When provided data does not match schema",
+      type: 'PrismaClientValidationError',
+      condition: 'When provided data does not match schema',
     },
   ];
 
@@ -157,13 +156,13 @@ function generatePrismaOperationDoc(element: CodeElement): JSDoc {
     description: `Database operation using Prisma ORM. Performs data persistence with type safety and automatic migrations. Handles relationships and ensures data integrity.`,
     params,
     returns: {
-      type: element.signature?.returnType || "Promise<any>",
-      description: "Database operation result with typed model data",
+      type: element.signature?.returnType || 'Promise<any>',
+      description: 'Database operation result with typed model data',
     },
     throws,
     tags: {
-      database: "prisma",
-      transaction: "atomic",
+      database: 'prisma',
+      transaction: 'atomic',
     },
   };
 }
@@ -178,7 +177,7 @@ function generateBusinessLogicDoc(element: CodeElement): JSDoc {
   const params: ParamDoc[] =
     element.signature?.parameters.map((p) => ({
       name: p.name,
-      type: p.type || "any",
+      type: p.type || 'any',
       description: `${p.name} - Input for business logic processing`,
       optional: p.optional,
     })) || [];
@@ -187,22 +186,22 @@ function generateBusinessLogicDoc(element: CodeElement): JSDoc {
     description: `Business logic implementation for workflow processing. Enforces business rules, validates data against domain requirements, and orchestrates multi-step processes. Critical for maintaining data consistency and business compliance.`,
     params,
     returns: {
-      type: element.signature?.returnType || "any",
-      description: "Processed result after applying business rules",
+      type: element.signature?.returnType || 'any',
+      description: 'Processed result after applying business rules',
     },
     throws: [
       {
-        type: "ValidationError",
-        condition: "When business rule validation fails",
+        type: 'ValidationError',
+        condition: 'When business rule validation fails',
       },
       {
-        type: "BusinessLogicError",
-        condition: "When business constraint is violated",
+        type: 'BusinessLogicError',
+        condition: 'When business constraint is violated',
       },
     ],
     tags: {
-      domain: "business-logic",
-      critical: "true",
+      domain: 'business-logic',
+      critical: 'true',
     },
   };
 }
@@ -217,7 +216,7 @@ function generatePDFGenerationDoc(element: CodeElement): JSDoc {
   const params: ParamDoc[] =
     element.signature?.parameters.map((p) => ({
       name: p.name,
-      type: p.type || "any",
+      type: p.type || 'any',
       description: `${p.name} - Data to include in generated PDF`,
       optional: p.optional,
     })) || [];
@@ -226,19 +225,18 @@ function generatePDFGenerationDoc(element: CodeElement): JSDoc {
     description: `PDF document generation function. Creates formatted PDF documents from workflow data. Handles templates, styling, and data formatting for professional document output.`,
     params,
     returns: {
-      type: "Promise<Buffer>",
-      description: "Generated PDF as binary buffer",
+      type: 'Promise<Buffer>',
+      description: 'Generated PDF as binary buffer',
     },
     throws: [
       {
-        type: "PDFGenerationError",
-        condition:
-          "When PDF generation fails due to invalid data or template issues",
+        type: 'PDFGenerationError',
+        condition: 'When PDF generation fails due to invalid data or template issues',
       },
     ],
     tags: {
-      output: "pdf",
-      format: "document",
+      output: 'pdf',
+      format: 'document',
     },
   };
 }
@@ -253,7 +251,7 @@ function generateAuditLoggingDoc(element: CodeElement): JSDoc {
   const params: ParamDoc[] =
     element.signature?.parameters.map((p) => ({
       name: p.name,
-      type: p.type || "any",
+      type: p.type || 'any',
       description: `${p.name} - Information to log for audit trail`,
       optional: p.optional,
     })) || [];
@@ -262,13 +260,13 @@ function generateAuditLoggingDoc(element: CodeElement): JSDoc {
     description: `Audit logging function that records user actions and system events for compliance and security tracking. Creates immutable audit trail with timestamps, user information, and action details. Essential for regulatory compliance and security investigations.`,
     params,
     returns: {
-      type: "Promise<void>",
-      description: "Audit log entry created successfully",
+      type: 'Promise<void>',
+      description: 'Audit log entry created successfully',
     },
     tags: {
-      compliance: "audit",
-      security: "logging",
-      immutable: "true",
+      compliance: 'audit',
+      security: 'logging',
+      immutable: 'true',
     },
   };
 }
@@ -283,7 +281,7 @@ function generateComplianceDoc(element: CodeElement): JSDoc {
   const params: ParamDoc[] =
     element.signature?.parameters.map((p) => ({
       name: p.name,
-      type: p.type || "any",
+      type: p.type || 'any',
       description: `${p.name} - Data to validate against compliance rules`,
       optional: p.optional,
     })) || [];
@@ -292,20 +290,19 @@ function generateComplianceDoc(element: CodeElement): JSDoc {
     description: `Compliance validation function that ensures data and operations meet regulatory requirements. Validates against industry standards, legal requirements, and internal policies. Critical for maintaining regulatory compliance and avoiding penalties.`,
     params,
     returns: {
-      type: element.signature?.returnType || "ValidationResult",
-      description:
-        "Validation result indicating compliance status and any violations",
+      type: element.signature?.returnType || 'ValidationResult',
+      description: 'Validation result indicating compliance status and any violations',
     },
     throws: [
       {
-        type: "ComplianceViolationError",
-        condition: "When data violates mandatory compliance rules",
+        type: 'ComplianceViolationError',
+        condition: 'When data violates mandatory compliance rules',
       },
     ],
     tags: {
-      compliance: "validation",
-      regulatory: "required",
-      critical: "true",
+      compliance: 'validation',
+      regulatory: 'required',
+      critical: 'true',
     },
   };
 }
@@ -322,13 +319,13 @@ function generateDefaultDoc(element: CodeElement): JSDoc {
     params:
       element.signature?.parameters.map((p) => ({
         name: p.name,
-        type: p.type || "any",
+        type: p.type || 'any',
         description: `Parameter ${p.name}`,
         optional: p.optional,
       })) || [],
     returns: {
-      type: element.signature?.returnType || "void",
-      description: "Function return value",
+      type: element.signature?.returnType || 'void',
+      description: 'Function return value',
     },
   };
 }

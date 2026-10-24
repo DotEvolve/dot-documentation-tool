@@ -5,7 +5,7 @@
  * Handles authentication middleware, proxy routing, CORS, and security headers.
  */
 
-import { CodeElement, JSDoc, ParamDoc, ThrowsDoc } from "../types";
+import { CodeElement, JSDoc, ParamDoc, ThrowsDoc } from '../types.js';
 
 /**
  * Generates specialized documentation for API Gateway components
@@ -47,10 +47,10 @@ export function generateAPIGatewayDoc(element: CodeElement): JSDoc {
 function isAuthMiddleware(element: CodeElement): boolean {
   const name = element.name.toLowerCase();
   return (
-    name.includes("auth") ||
-    name.includes("authenticate") ||
-    name.includes("verify") ||
-    name.includes("token")
+    name.includes('auth') ||
+    name.includes('authenticate') ||
+    name.includes('verify') ||
+    name.includes('token')
   );
 }
 
@@ -62,11 +62,7 @@ function isAuthMiddleware(element: CodeElement): boolean {
  */
 function isProxyRoute(element: CodeElement): boolean {
   const name = element.name.toLowerCase();
-  return (
-    name.includes("proxy") ||
-    name.includes("forward") ||
-    name.includes("redirect")
-  );
+  return name.includes('proxy') || name.includes('forward') || name.includes('redirect');
 }
 
 /**
@@ -77,7 +73,7 @@ function isProxyRoute(element: CodeElement): boolean {
  */
 function isCORSConfig(element: CodeElement): boolean {
   const name = element.name.toLowerCase();
-  return name.includes("cors");
+  return name.includes('cors');
 }
 
 /**
@@ -88,11 +84,7 @@ function isCORSConfig(element: CodeElement): boolean {
  */
 function isSecurityHeadersMiddleware(element: CodeElement): boolean {
   const name = element.name.toLowerCase();
-  return (
-    name.includes("security") ||
-    name.includes("header") ||
-    name.includes("helmet")
-  );
+  return name.includes('security') || name.includes('header') || name.includes('helmet');
 }
 
 /**
@@ -104,32 +96,30 @@ function isSecurityHeadersMiddleware(element: CodeElement): boolean {
 function generateAuthMiddlewareDoc(_element: CodeElement): JSDoc {
   const params: ParamDoc[] = [
     {
-      name: "req",
-      type: "express.Request",
-      description:
-        "Express request object containing authentication credentials",
+      name: 'req',
+      type: 'express.Request',
+      description: 'Express request object containing authentication credentials',
     },
     {
-      name: "res",
-      type: "express.Response",
-      description: "Express response object for sending authentication errors",
+      name: 'res',
+      type: 'express.Response',
+      description: 'Express response object for sending authentication errors',
     },
     {
-      name: "next",
-      type: "express.NextFunction",
-      description:
-        "Callback to pass control to next middleware if authenticated",
+      name: 'next',
+      type: 'express.NextFunction',
+      description: 'Callback to pass control to next middleware if authenticated',
     },
   ];
 
   const throws: ThrowsDoc[] = [
     {
-      type: "HTTP401",
-      condition: "When authentication token is missing or invalid",
+      type: 'HTTP401',
+      condition: 'When authentication token is missing or invalid',
     },
     {
-      type: "HTTP403",
-      condition: "When user lacks required permissions",
+      type: 'HTTP403',
+      condition: 'When user lacks required permissions',
     },
   ];
 
@@ -137,14 +127,13 @@ function generateAuthMiddlewareDoc(_element: CodeElement): JSDoc {
     description: `Authentication middleware that verifies user credentials and attaches user information to the request. Protects routes by ensuring only authenticated users can access them.`,
     params,
     returns: {
-      type: "void",
-      description:
-        "Calls next() if authenticated, sends error response otherwise",
+      type: 'void',
+      description: 'Calls next() if authenticated, sends error response otherwise',
     },
     throws,
     tags: {
-      middleware: "authentication",
-      access: "protected",
+      middleware: 'authentication',
+      access: 'protected',
     },
   };
 }
@@ -158,14 +147,14 @@ function generateAuthMiddlewareDoc(_element: CodeElement): JSDoc {
 function generateProxyRouteDoc(_element: CodeElement): JSDoc {
   const params: ParamDoc[] = [
     {
-      name: "req",
-      type: "express.Request",
-      description: "Incoming request to be proxied to backend service",
+      name: 'req',
+      type: 'express.Request',
+      description: 'Incoming request to be proxied to backend service',
     },
     {
-      name: "res",
-      type: "express.Response",
-      description: "Response object to send backend service response",
+      name: 'res',
+      type: 'express.Response',
+      description: 'Response object to send backend service response',
     },
   ];
 
@@ -173,22 +162,22 @@ function generateProxyRouteDoc(_element: CodeElement): JSDoc {
     description: `Proxy route that forwards requests to backend microservices. Handles request transformation, response aggregation, and error handling for service communication.`,
     params,
     returns: {
-      type: "Promise<void>",
-      description: "Proxied response from backend service",
+      type: 'Promise<void>',
+      description: 'Proxied response from backend service',
     },
     throws: [
       {
-        type: "HTTP502",
-        condition: "When backend service is unavailable",
+        type: 'HTTP502',
+        condition: 'When backend service is unavailable',
       },
       {
-        type: "HTTP504",
-        condition: "When backend service request times out",
+        type: 'HTTP504',
+        condition: 'When backend service request times out',
       },
     ],
     tags: {
-      pattern: "proxy",
-      service: "gateway",
+      pattern: 'proxy',
+      service: 'gateway',
     },
   };
 }
@@ -204,28 +193,28 @@ function generateCORSDoc(_element: CodeElement): JSDoc {
     description: `CORS (Cross-Origin Resource Sharing) configuration middleware. Defines which origins, methods, and headers are allowed for cross-origin requests. Essential for frontend-backend communication.`,
     params: [
       {
-        name: "req",
-        type: "express.Request",
-        description: "Request object to check origin",
+        name: 'req',
+        type: 'express.Request',
+        description: 'Request object to check origin',
       },
       {
-        name: "res",
-        type: "express.Response",
-        description: "Response object to set CORS headers",
+        name: 'res',
+        type: 'express.Response',
+        description: 'Response object to set CORS headers',
       },
       {
-        name: "next",
-        type: "express.NextFunction",
-        description: "Callback to continue request processing",
+        name: 'next',
+        type: 'express.NextFunction',
+        description: 'Callback to continue request processing',
       },
     ],
     returns: {
-      type: "void",
-      description: "Sets CORS headers and calls next()",
+      type: 'void',
+      description: 'Sets CORS headers and calls next()',
     },
     tags: {
-      middleware: "cors",
-      security: "cross-origin",
+      middleware: 'cors',
+      security: 'cross-origin',
     },
   };
 }
@@ -241,29 +230,28 @@ function generateSecurityHeadersDoc(_element: CodeElement): JSDoc {
     description: `Security headers middleware that adds HTTP security headers to responses. Protects against common web vulnerabilities like XSS, clickjacking, and MIME sniffing. Implements security best practices.`,
     params: [
       {
-        name: "req",
-        type: "express.Request",
-        description: "Request object",
+        name: 'req',
+        type: 'express.Request',
+        description: 'Request object',
       },
       {
-        name: "res",
-        type: "express.Response",
-        description: "Response object to set security headers",
+        name: 'res',
+        type: 'express.Response',
+        description: 'Response object to set security headers',
       },
       {
-        name: "next",
-        type: "express.NextFunction",
-        description: "Callback to continue request processing",
+        name: 'next',
+        type: 'express.NextFunction',
+        description: 'Callback to continue request processing',
       },
     ],
     returns: {
-      type: "void",
-      description: "Sets security headers and calls next()",
+      type: 'void',
+      description: 'Sets security headers and calls next()',
     },
     tags: {
-      middleware: "security",
-      headers:
-        "Content-Security-Policy, X-Frame-Options, X-Content-Type-Options",
+      middleware: 'security',
+      headers: 'Content-Security-Policy, X-Frame-Options, X-Content-Type-Options',
     },
   };
 }
@@ -280,13 +268,13 @@ function generateDefaultDoc(element: CodeElement): JSDoc {
     params:
       element.signature?.parameters.map((p) => ({
         name: p.name,
-        type: p.type || "any",
+        type: p.type || 'any',
         description: `Parameter ${p.name}`,
         optional: p.optional,
       })) || [],
     returns: {
-      type: element.signature?.returnType || "void",
-      description: "Function return value",
+      type: element.signature?.returnType || 'void',
+      description: 'Function return value',
     },
   };
 }

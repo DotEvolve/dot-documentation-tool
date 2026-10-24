@@ -11,7 +11,7 @@ import {
   ValidationWarning,
   ValidationErrorType,
   ValidationWarningType,
-} from "../types";
+} from '../types.js';
 
 /**
  * Glossary of standard terminology
@@ -33,11 +33,7 @@ export interface TerminologyIssue {
  * Represents a validation issue for completeness checks
  */
 export interface ValidationIssue {
-  type:
-    | "missing_param"
-    | "missing_return"
-    | "missing_throws"
-    | "param_mismatch";
+  type: 'missing_param' | 'missing_return' | 'missing_throws' | 'param_mismatch';
   message: string;
   paramName?: string;
 }
@@ -62,50 +58,50 @@ export class DocumentationValidator {
     const errors: ValidationError[] = [];
 
     // Check if JSDoc starts with /**
-    if (!jsdoc.trim().startsWith("/**")) {
+    if (!jsdoc.trim().startsWith('/**')) {
       errors.push({
         type: ValidationErrorType.SYNTAX,
-        message: "JSDoc comment must start with /**",
+        message: 'JSDoc comment must start with /**',
         location: { line: 1, column: 1 },
       });
     }
 
     // Check if JSDoc ends with */
-    if (!jsdoc.trim().endsWith("*/")) {
+    if (!jsdoc.trim().endsWith('*/')) {
       errors.push({
         type: ValidationErrorType.SYNTAX,
-        message: "JSDoc comment must end with */",
-        location: { line: jsdoc.split("\n").length, column: 1 },
+        message: 'JSDoc comment must end with */',
+        location: { line: jsdoc.split('\n').length, column: 1 },
       });
     }
 
     // Check for valid JSDoc tags
     const validTags = [
-      "@param",
-      "@returns",
-      "@return",
-      "@throws",
-      "@throw",
-      "@example",
-      "@description",
-      "@type",
-      "@typedef",
-      "@property",
-      "@prop",
-      "@async",
-      "@private",
-      "@public",
-      "@protected",
-      "@readonly",
-      "@deprecated",
-      "@see",
-      "@since",
-      "@version",
-      "@author",
-      "@license",
+      '@param',
+      '@returns',
+      '@return',
+      '@throws',
+      '@throw',
+      '@example',
+      '@description',
+      '@type',
+      '@typedef',
+      '@property',
+      '@prop',
+      '@async',
+      '@private',
+      '@public',
+      '@protected',
+      '@readonly',
+      '@deprecated',
+      '@see',
+      '@since',
+      '@version',
+      '@author',
+      '@license',
     ];
 
-    const lines = jsdoc.split("\n");
+    const lines = jsdoc.split('\n');
     lines.forEach((line, index) => {
       const trimmedLine = line.trim();
 
@@ -124,12 +120,11 @@ export class DocumentationValidator {
 
       // Check for unmatched braces in type annotations
       const braceCount =
-        (trimmedLine.match(/{/g) || []).length -
-        (trimmedLine.match(/}/g) || []).length;
+        (trimmedLine.match(/{/g) || []).length - (trimmedLine.match(/}/g) || []).length;
       if (braceCount !== 0) {
         errors.push({
           type: ValidationErrorType.SYNTAX,
-          message: "Unmatched braces in type annotation",
+          message: 'Unmatched braces in type annotation',
           location: { line: index + 1, column: 1 },
         });
       }
@@ -137,10 +132,8 @@ export class DocumentationValidator {
 
     // Check for proper @param format: @param {type} name - description
     lines.forEach((line, index) => {
-      if (line.includes("@param")) {
-        const paramMatch = line.match(
-          /@param\s+(?:{([^}]+)}\s+)?(\[?[\w.]+\]?)?(?:\s+-?\s*(.+))?/,
-        );
+      if (line.includes('@param')) {
+        const paramMatch = line.match(/@param\s+(?:{([^}]+)}\s+)?(\[?[\w.]+\]?)?(?:\s+-?\s*(.+))?/);
         if (paramMatch) {
           const [, type, name] = paramMatch;
 
@@ -148,23 +141,23 @@ export class DocumentationValidator {
           if (!type) {
             errors.push({
               type: ValidationErrorType.SYNTAX,
-              message: `@param ${name || "(unnamed)"} is missing type annotation`,
+              message: `@param ${name || '(unnamed)'} is missing type annotation`,
               location: { line: index + 1, column: 1 },
             });
           }
 
           // Check if name is present (name is required even if type is present)
-          if (!name || name.trim() === "") {
+          if (!name || name.trim() === '') {
             errors.push({
               type: ValidationErrorType.SYNTAX,
-              message: "@param is missing parameter name",
+              message: '@param is missing parameter name',
               location: { line: index + 1, column: 1 },
             });
           }
         } else {
           errors.push({
             type: ValidationErrorType.SYNTAX,
-            message: "Malformed @param tag",
+            message: 'Malformed @param tag',
             location: { line: index + 1, column: 1 },
           });
         }
@@ -173,7 +166,7 @@ export class DocumentationValidator {
 
     // Check for proper @returns format: @returns {type} description
     lines.forEach((line, index) => {
-      if (line.includes("@returns") || line.includes("@return")) {
+      if (line.includes('@returns') || line.includes('@return')) {
         const returnsMatch = line.match(/@returns?\s+{([^}]+)}\s*(.+)?/);
         if (returnsMatch) {
           const [, type] = returnsMatch;
@@ -181,7 +174,7 @@ export class DocumentationValidator {
           if (!type) {
             errors.push({
               type: ValidationErrorType.SYNTAX,
-              message: "@returns is missing type annotation",
+              message: '@returns is missing type annotation',
               location: { line: index + 1, column: 1 },
             });
           }
@@ -190,7 +183,7 @@ export class DocumentationValidator {
           if (line.match(/@returns?\s+[^{]/)) {
             errors.push({
               type: ValidationErrorType.SYNTAX,
-              message: "@returns is missing type annotation",
+              message: '@returns is missing type annotation',
               location: { line: index + 1, column: 1 },
             });
           }
@@ -208,10 +201,7 @@ export class DocumentationValidator {
    * @param signature - The function signature to validate against
    * @returns Array of validation issues found
    */
-  validateCompleteness(
-    jsdoc: JSDoc,
-    signature: FunctionSignature,
-  ): ValidationIssue[] {
+  validateCompleteness(jsdoc: JSDoc, signature: FunctionSignature): ValidationIssue[] {
     const issues: ValidationIssue[] = [];
 
     // Check that all parameters are documented
@@ -219,7 +209,7 @@ export class DocumentationValidator {
       const documented = jsdoc.params?.find((p) => p.name === param.name);
       if (!documented) {
         issues.push({
-          type: "missing_param",
+          type: 'missing_param',
           message: `Parameter '${param.name}' is not documented`,
           paramName: param.name,
         });
@@ -231,7 +221,7 @@ export class DocumentationValidator {
       const exists = signature.parameters.find((p) => p.name === paramDoc.name);
       if (!exists) {
         issues.push({
-          type: "param_mismatch",
+          type: 'param_mismatch',
           message: `Documented parameter '${paramDoc.name}' does not exist in function signature`,
           paramName: paramDoc.name,
         });
@@ -239,14 +229,10 @@ export class DocumentationValidator {
     });
 
     // Check that return type is documented for non-void functions
-    if (
-      signature.returnType &&
-      signature.returnType !== "void" &&
-      !jsdoc.returns
-    ) {
+    if (signature.returnType && signature.returnType !== 'void' && !jsdoc.returns) {
       issues.push({
-        type: "missing_return",
-        message: "Function has a return type but @returns is not documented",
+        type: 'missing_return',
+        message: 'Function has a return type but @returns is not documented',
       });
     }
 
@@ -257,8 +243,8 @@ export class DocumentationValidator {
       (!jsdoc.throws || jsdoc.throws.length === 0)
     ) {
       issues.push({
-        type: "missing_throws",
-        message: "Function throws errors but @throws is not documented",
+        type: 'missing_throws',
+        message: 'Function throws errors but @throws is not documented',
       });
     }
 
@@ -296,9 +282,7 @@ export class DocumentationValidator {
         if (match) {
           // Check if the key word appears in the code
           const keyWords = match.filter((m) => m && m.length > 3);
-          const hasMatch = keyWords.some((word) =>
-            codeLower.includes(word.toLowerCase()),
-          );
+          const hasMatch = keyWords.some((word) => codeLower.includes(word.toLowerCase()));
           if (hasMatch) {
             return true;
           }
@@ -310,9 +294,9 @@ export class DocumentationValidator {
     // Split both code and description into words, handling camelCase
     const splitCamelCase = (str: string) => {
       return str
-        .replace(/([a-z])([A-Z])/g, "$1 $2") // Insert space before capital letters
+        .replace(/([a-z])([A-Z])/g, '$1 $2') // Insert space before capital letters
         .toLowerCase()
-        .replace(/[^a-z0-9]/g, " ")
+        .replace(/[^a-z0-9]/g, ' ')
         .split(/\s+/)
         .filter((w) => w.length > 2);
     };
@@ -322,30 +306,26 @@ export class DocumentationValidator {
 
     // Filter out common words that don't indicate redundancy
     const commonWords = [
-      "the",
-      "and",
-      "for",
-      "with",
-      "from",
-      "this",
-      "that",
-      "are",
-      "was",
-      "has",
-      "have",
+      'the',
+      'and',
+      'for',
+      'with',
+      'from',
+      'this',
+      'that',
+      'are',
+      'was',
+      'has',
+      'have',
     ];
-    const meaningfulDescWords = descWords.filter(
-      (w) => !commonWords.includes(w),
-    );
+    const meaningfulDescWords = descWords.filter((w) => !commonWords.includes(w));
 
     if (meaningfulDescWords.length === 0) {
       return true;
     }
 
     // If most meaningful words in description appear in code, it's likely redundant
-    const matchingWords = meaningfulDescWords.filter((word) =>
-      codeWords.includes(word),
-    );
+    const matchingWords = meaningfulDescWords.filter((word) => codeWords.includes(word));
     if (matchingWords.length >= meaningfulDescWords.length * 0.75) {
       return true;
     }
@@ -367,14 +347,14 @@ export class DocumentationValidator {
     const allText = [
       jsdoc.description,
       ...(jsdoc.params?.map((p) => p.description) || []),
-      jsdoc.returns?.description || "",
+      jsdoc.returns?.description || '',
       ...(jsdoc.throws?.map((t) => t.condition) || []),
-      jsdoc.example || "",
-    ].join(" ");
+      jsdoc.example || '',
+    ].join(' ');
 
     // Check for incorrect terms
     glossary.terms.forEach((correctTerm, incorrectTerm) => {
-      const regex = new RegExp(`\\b${incorrectTerm}\\b`, "gi");
+      const regex = new RegExp(`\\b${incorrectTerm}\\b`, 'gi');
       const matches = allText.match(regex);
 
       if (matches) {
@@ -382,7 +362,7 @@ export class DocumentationValidator {
           issues.push({
             incorrectTerm,
             correctTerm,
-            location: "JSDoc comment",
+            location: 'JSDoc comment',
           });
         });
       }
@@ -404,7 +384,7 @@ export class DocumentationValidator {
     jsdoc: JSDoc,
     jsdocString: string,
     signature?: FunctionSignature,
-    code?: string,
+    code?: string
   ): ValidationResult {
     const errors: ValidationError[] = [];
     const warnings: ValidationWarning[] = [];
@@ -430,9 +410,9 @@ export class DocumentationValidator {
       if (isRedundant) {
         warnings.push({
           type: ValidationWarningType.REDUNDANCY,
-          message: "Documentation appears to be redundant or trivial",
+          message: 'Documentation appears to be redundant or trivial',
           suggestion:
-            "Provide more meaningful description that explains why and how, not just what",
+            'Provide more meaningful description that explains why and how, not just what',
         });
       }
     }

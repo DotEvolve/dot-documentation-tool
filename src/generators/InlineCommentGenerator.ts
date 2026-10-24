@@ -5,7 +5,7 @@
  * Detects patterns that need explanation and creates contextual comments.
  */
 
-import * as t from "@babel/types";
+import * as t from '@babel/types';
 
 /**
  * Represents an inline comment to be inserted
@@ -14,7 +14,7 @@ export interface InlineComment {
   line: number;
   column: number;
   text: string;
-  type: "conditional" | "algorithm" | "calculation" | "edge-case";
+  type: 'conditional' | 'algorithm' | 'calculation' | 'edge-case';
 }
 
 /**
@@ -31,11 +31,7 @@ export function generateInlineComments(node: t.Node): InlineComment[] {
     comments.push(...conditionalComments);
   }
 
-  if (
-    t.isForStatement(node) ||
-    t.isWhileStatement(node) ||
-    t.isDoWhileStatement(node)
-  ) {
+  if (t.isForStatement(node) || t.isWhileStatement(node) || t.isDoWhileStatement(node)) {
     const loopComments = analyzeLoop(node);
     comments.push(...loopComments);
   }
@@ -54,19 +50,17 @@ export function generateInlineComments(node: t.Node): InlineComment[] {
  * @param node - Conditional AST node
  * @returns Array of comments for complex conditions
  */
-function analyzeConditional(
-  node: t.IfStatement | t.ConditionalExpression,
-): InlineComment[] {
+function analyzeConditional(node: t.IfStatement | t.ConditionalExpression): InlineComment[] {
   const comments: InlineComment[] = [];
 
   // Check for complex boolean expressions
-  const test = "test" in node ? node.test : null;
+  const test = 'test' in node ? node.test : null;
   if (test && isComplexCondition(test)) {
     comments.push({
       line: node.loc?.start.line || 0,
       column: node.loc?.start.column || 0,
       text: `Check complex condition: ${describeCondition(test)}`,
-      type: "conditional",
+      type: 'conditional',
     });
   }
 
@@ -80,7 +74,7 @@ function analyzeConditional(
  * @returns Array of comments for loops
  */
 function analyzeLoop(
-  node: t.ForStatement | t.WhileStatement | t.DoWhileStatement,
+  node: t.ForStatement | t.WhileStatement | t.DoWhileStatement
 ): InlineComment[] {
   const comments: InlineComment[] = [];
 
@@ -89,7 +83,7 @@ function analyzeLoop(
     line: node.loc?.start.line || 0,
     column: node.loc?.start.column || 0,
     text: `Iterate to process ${getLoopPurpose(node)}`,
-    type: "algorithm",
+    type: 'algorithm',
   });
 
   return comments;
@@ -108,7 +102,7 @@ function analyzeCalculation(node: t.BinaryExpression): InlineComment[] {
     line: node.loc?.start.line || 0,
     column: node.loc?.start.column || 0,
     text: `Calculate: ${describeCalculation(node)}`,
-    type: "calculation",
+    type: 'calculation',
   });
 
   return comments;
@@ -128,9 +122,7 @@ function isComplexCondition(node: t.Expression): boolean {
 
   // Complex if it has nested conditions
   if (t.isBinaryExpression(node)) {
-    return (
-      t.isLogicalExpression(node.left) || t.isLogicalExpression(node.right)
-    );
+    return t.isLogicalExpression(node.left) || t.isLogicalExpression(node.right);
   }
 
   return false;
@@ -157,7 +149,7 @@ function describeCondition(node: t.Expression): string {
     return node.name;
   }
 
-  return "condition";
+  return 'condition';
 }
 
 /**
@@ -167,7 +159,7 @@ function describeCondition(node: t.Expression): string {
  * @returns True if it's a mathematical calculation
  */
 function isCalculation(node: t.BinaryExpression): boolean {
-  const mathOperators = ["+", "-", "*", "/", "%", "**"];
+  const mathOperators = ['+', '-', '*', '/', '%', '**'];
   return mathOperators.includes(node.operator);
 }
 
@@ -182,12 +174,12 @@ function describeCalculation(node: t.BinaryExpression): string {
   const right = getIdentifierName(node.right);
 
   const operatorDescriptions: Record<string, string> = {
-    "+": "sum of",
-    "-": "difference between",
-    "*": "product of",
-    "/": "quotient of",
-    "%": "remainder of",
-    "**": "power of",
+    '+': 'sum of',
+    '-': 'difference between',
+    '*': 'product of',
+    '/': 'quotient of',
+    '%': 'remainder of',
+    '**': 'power of',
   };
 
   const desc = operatorDescriptions[node.operator] || node.operator;
@@ -200,22 +192,16 @@ function describeCalculation(node: t.BinaryExpression): string {
  * @param node - Loop node
  * @returns Description of loop purpose
  */
-function getLoopPurpose(
-  node: t.ForStatement | t.WhileStatement | t.DoWhileStatement,
-): string {
+function getLoopPurpose(node: t.ForStatement | t.WhileStatement | t.DoWhileStatement): string {
   // Try to infer from variable names or structure
-  if (
-    t.isForStatement(node) &&
-    node.init &&
-    t.isVariableDeclaration(node.init)
-  ) {
+  if (t.isForStatement(node) && node.init && t.isVariableDeclaration(node.init)) {
     const declarations = node.init.declarations;
     if (declarations.length > 0 && t.isIdentifier(declarations[0].id)) {
       return `items using ${declarations[0].id.name}`;
     }
   }
 
-  return "items";
+  return 'items';
 }
 
 /**
@@ -233,11 +219,11 @@ function getIdentifierName(node: t.Expression | t.PrivateName): string {
     return node.property.name;
   }
 
-  if (t.isLiteral(node) && "value" in node) {
+  if (t.isLiteral(node) && 'value' in node) {
     return String(node.value);
   }
 
-  return "value";
+  return 'value';
 }
 
 /**
@@ -247,7 +233,7 @@ export interface BusinessRule {
   line: number;
   column: number;
   description: string;
-  ruleType: "validation" | "compliance" | "workflow" | "authorization";
+  ruleType: 'validation' | 'compliance' | 'workflow' | 'authorization';
 }
 
 /**
@@ -264,8 +250,8 @@ export function detectBusinessRules(node: t.Node): BusinessRule[] {
     rules.push({
       line: node.loc?.start.line || 0,
       column: node.loc?.start.column || 0,
-      description: "Validates input data according to business requirements",
-      ruleType: "validation",
+      description: 'Validates input data according to business requirements',
+      ruleType: 'validation',
     });
   }
 
@@ -274,8 +260,8 @@ export function detectBusinessRules(node: t.Node): BusinessRule[] {
     rules.push({
       line: node.loc?.start.line || 0,
       column: node.loc?.start.column || 0,
-      description: "Enforces authorization rules for access control",
-      ruleType: "authorization",
+      description: 'Enforces authorization rules for access control',
+      ruleType: 'authorization',
     });
   }
 
@@ -284,8 +270,8 @@ export function detectBusinessRules(node: t.Node): BusinessRule[] {
     rules.push({
       line: node.loc?.start.line || 0,
       column: node.loc?.start.column || 0,
-      description: "Implements compliance requirement",
-      ruleType: "compliance",
+      description: 'Implements compliance requirement',
+      ruleType: 'compliance',
     });
   }
 
@@ -294,8 +280,8 @@ export function detectBusinessRules(node: t.Node): BusinessRule[] {
     rules.push({
       line: node.loc?.start.line || 0,
       column: node.loc?.start.column || 0,
-      description: "Manages workflow state transition",
-      ruleType: "workflow",
+      description: 'Manages workflow state transition',
+      ruleType: 'workflow',
     });
   }
 
@@ -310,13 +296,7 @@ export function detectBusinessRules(node: t.Node): BusinessRule[] {
  */
 function isValidationPattern(node: t.Node): boolean {
   // Look for validation keywords in identifiers
-  const validationKeywords = [
-    "validate",
-    "check",
-    "verify",
-    "ensure",
-    "assert",
-  ];
+  const validationKeywords = ['validate', 'check', 'verify', 'ensure', 'assert'];
 
   if (t.isCallExpression(node) && t.isIdentifier(node.callee)) {
     const name = node.callee.name.toLowerCase();
@@ -338,7 +318,7 @@ function isValidationPattern(node: t.Node): boolean {
  * @returns True if authorization pattern detected
  */
 function isAuthorizationPattern(node: t.Node): boolean {
-  const authKeywords = ["authorize", "permission", "access", "role", "allowed"];
+  const authKeywords = ['authorize', 'permission', 'access', 'role', 'allowed'];
 
   if (t.isCallExpression(node) && t.isIdentifier(node.callee)) {
     const name = node.callee.name.toLowerCase();
@@ -369,14 +349,7 @@ function isAuthorizationPattern(node: t.Node): boolean {
  * @returns True if compliance pattern detected
  */
 function isCompliancePattern(node: t.Node): boolean {
-  const complianceKeywords = [
-    "compliance",
-    "audit",
-    "gdpr",
-    "hipaa",
-    "pci",
-    "sox",
-  ];
+  const complianceKeywords = ['compliance', 'audit', 'gdpr', 'hipaa', 'pci', 'sox'];
 
   if (t.isCallExpression(node) && t.isIdentifier(node.callee)) {
     const name = node.callee.name.toLowerCase();
@@ -403,14 +376,7 @@ function isCompliancePattern(node: t.Node): boolean {
  * @returns True if workflow pattern detected
  */
 function isWorkflowPattern(node: t.Node): boolean {
-  const workflowKeywords = [
-    "workflow",
-    "transition",
-    "state",
-    "status",
-    "approve",
-    "reject",
-  ];
+  const workflowKeywords = ['workflow', 'transition', 'state', 'status', 'approve', 'reject'];
 
   if (t.isCallExpression(node) && t.isIdentifier(node.callee)) {
     const name = node.callee.name.toLowerCase();

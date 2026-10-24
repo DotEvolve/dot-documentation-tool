@@ -4,21 +4,21 @@
  * Tests inline comment generation for complex logic, algorithms, and business rules.
  */
 
-import { parse } from "@babel/parser";
-import traverse from "@babel/traverse";
-import * as t from "@babel/types";
+import { parse } from '@babel/parser';
+import traverse from '@babel/traverse';
+import * as t from '@babel/types';
 import {
   generateInlineComments,
   detectBusinessRules,
-} from "../../src/generators/InlineCommentGenerator";
+} from '../../src/generators/InlineCommentGenerator';
 
 /**
  * Helper to parse code and extract first matching node
  */
 function parseAndExtract(code: string, nodeType: string): t.Node | null {
   const ast = parse(code, {
-    sourceType: "module",
-    plugins: ["typescript"],
+    sourceType: 'module',
+    plugins: ['typescript'],
   });
 
   let foundNode: t.Node | null = null;
@@ -34,31 +34,31 @@ function parseAndExtract(code: string, nodeType: string): t.Node | null {
   return foundNode;
 }
 
-describe("InlineCommentGenerator", () => {
-  describe("Complex conditional documentation", () => {
-    it("should generate comments for complex if statements", () => {
+describe('InlineCommentGenerator', () => {
+  describe('Complex conditional documentation', () => {
+    it('should generate comments for complex if statements', () => {
       const code = `
         if (user.isActive && user.role === 'admin' || user.isSuperUser) {
           console.log('Access granted');
         }
       `;
 
-      const node = parseAndExtract(code, "IfStatement");
+      const node = parseAndExtract(code, 'IfStatement');
       expect(node).not.toBeNull();
 
       const comments = generateInlineComments(node!);
       expect(comments.length).toBeGreaterThan(0);
-      expect(comments[0].type).toBe("conditional");
+      expect(comments[0].type).toBe('conditional');
     });
 
-    it("should not generate comments for simple conditions", () => {
+    it('should not generate comments for simple conditions', () => {
       const code = `
         if (user.isActive) {
           console.log('Active');
         }
       `;
 
-      const node = parseAndExtract(code, "IfStatement");
+      const node = parseAndExtract(code, 'IfStatement');
       expect(node).not.toBeNull();
 
       const comments = generateInlineComments(node!);
@@ -67,47 +67,47 @@ describe("InlineCommentGenerator", () => {
     });
   });
 
-  describe("Loop documentation", () => {
-    it("should generate comments for for loops", () => {
+  describe('Loop documentation', () => {
+    it('should generate comments for for loops', () => {
       const code = `
         for (let i = 0; i < items.length; i++) {
           process(items[i]);
         }
       `;
 
-      const node = parseAndExtract(code, "ForStatement");
+      const node = parseAndExtract(code, 'ForStatement');
       expect(node).not.toBeNull();
 
       const comments = generateInlineComments(node!);
       expect(comments.length).toBeGreaterThan(0);
-      expect(comments[0].type).toBe("algorithm");
-      expect(comments[0].text).toContain("Iterate");
+      expect(comments[0].type).toBe('algorithm');
+      expect(comments[0].text).toContain('Iterate');
     });
 
-    it("should generate comments for while loops", () => {
+    it('should generate comments for while loops', () => {
       const code = `
         while (hasMore) {
           fetchNext();
         }
       `;
 
-      const node = parseAndExtract(code, "WhileStatement");
+      const node = parseAndExtract(code, 'WhileStatement');
       expect(node).not.toBeNull();
 
       const comments = generateInlineComments(node!);
       expect(comments.length).toBeGreaterThan(0);
-      expect(comments[0].type).toBe("algorithm");
+      expect(comments[0].type).toBe('algorithm');
     });
   });
 
-  describe("Calculation documentation", () => {
-    it("should generate comments for mathematical calculations", () => {
+  describe('Calculation documentation', () => {
+    it('should generate comments for mathematical calculations', () => {
       const code = `
         const total = price * quantity + tax;
       `;
 
       // Find the binary expression
-      const ast = parse(code, { sourceType: "module" });
+      const ast = parse(code, { sourceType: 'module' });
       let calcNode: t.Node | null = null;
 
       traverse(ast, {
@@ -122,20 +122,20 @@ describe("InlineCommentGenerator", () => {
 
       const comments = generateInlineComments(calcNode!);
       expect(comments.length).toBeGreaterThan(0);
-      expect(comments[0].type).toBe("calculation");
-      expect(comments[0].text).toContain("Calculate");
+      expect(comments[0].type).toBe('calculation');
+      expect(comments[0].text).toContain('Calculate');
     });
 
-    it("should describe different operators correctly", () => {
+    it('should describe different operators correctly', () => {
       const operators = [
-        { code: "a + b", desc: "sum of" },
-        { code: "a - b", desc: "difference between" },
-        { code: "a * b", desc: "product of" },
-        { code: "a / b", desc: "quotient of" },
+        { code: 'a + b', desc: 'sum of' },
+        { code: 'a - b', desc: 'difference between' },
+        { code: 'a * b', desc: 'product of' },
+        { code: 'a / b', desc: 'quotient of' },
       ];
 
       operators.forEach(({ code, desc }) => {
-        const ast = parse(code, { sourceType: "module" });
+        const ast = parse(code, { sourceType: 'module' });
         let calcNode: t.Node | null = null;
 
         traverse(ast, {
@@ -156,28 +156,28 @@ describe("InlineCommentGenerator", () => {
     });
   });
 
-  describe("Business rule detection", () => {
-    it("should detect validation patterns", () => {
+  describe('Business rule detection', () => {
+    it('should detect validation patterns', () => {
       const code = `
         validateUserInput(data);
       `;
 
-      const node = parseAndExtract(code, "CallExpression");
+      const node = parseAndExtract(code, 'CallExpression');
       expect(node).not.toBeNull();
 
       const rules = detectBusinessRules(node!);
       expect(rules.length).toBeGreaterThan(0);
-      expect(rules[0].ruleType).toBe("validation");
+      expect(rules[0].ruleType).toBe('validation');
     });
 
-    it("should detect authorization patterns", () => {
+    it('should detect authorization patterns', () => {
       const code = `
         if (user.hasRole('admin')) {
           // do something
         }
       `;
 
-      const ast = parse(code, { sourceType: "module" });
+      const ast = parse(code, { sourceType: 'module' });
       let callNode: t.Node | null = null;
 
       traverse(ast, {
@@ -192,15 +192,15 @@ describe("InlineCommentGenerator", () => {
 
       const rules = detectBusinessRules(callNode!);
       expect(rules.length).toBeGreaterThan(0);
-      expect(rules[0].ruleType).toBe("authorization");
+      expect(rules[0].ruleType).toBe('authorization');
     });
 
-    it("should detect workflow patterns", () => {
+    it('should detect workflow patterns', () => {
       const code = `
         workflow.transition('approved');
       `;
 
-      const ast = parse(code, { sourceType: "module" });
+      const ast = parse(code, { sourceType: 'module' });
       let memberNode: t.Node | null = null;
 
       traverse(ast, {
@@ -215,15 +215,15 @@ describe("InlineCommentGenerator", () => {
 
       const rules = detectBusinessRules(memberNode!);
       expect(rules.length).toBeGreaterThan(0);
-      expect(rules[0].ruleType).toBe("workflow");
+      expect(rules[0].ruleType).toBe('workflow');
     });
 
-    it("should detect compliance patterns", () => {
+    it('should detect compliance patterns', () => {
       const code = `
         auditLog.record(action);
       `;
 
-      const ast = parse(code, { sourceType: "module" });
+      const ast = parse(code, { sourceType: 'module' });
       let memberNode: t.Node | null = null;
 
       traverse(ast, {
@@ -238,15 +238,15 @@ describe("InlineCommentGenerator", () => {
 
       const rules = detectBusinessRules(memberNode!);
       expect(rules.length).toBeGreaterThan(0);
-      expect(rules[0].ruleType).toBe("compliance");
+      expect(rules[0].ruleType).toBe('compliance');
     });
 
-    it("should not detect rules in regular code", () => {
+    it('should not detect rules in regular code', () => {
       const code = `
         console.log('Hello');
       `;
 
-      const node = parseAndExtract(code, "CallExpression");
+      const node = parseAndExtract(code, 'CallExpression');
       expect(node).not.toBeNull();
 
       const rules = detectBusinessRules(node!);

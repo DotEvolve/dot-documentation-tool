@@ -5,23 +5,23 @@
  * type aliases, and class declarations.
  */
 
-import * as parser from "@babel/parser";
-import { DataModelAnalyzer } from "../../src/analyzers/DataModelAnalyzer";
-import { DataModelType } from "../../src/types";
+import * as parser from '@babel/parser';
+import { DataModelAnalyzer } from '../../src/analyzers/DataModelAnalyzer';
+import { DataModelType } from '../../src/types';
 
-describe("DataModelAnalyzer", () => {
+describe('DataModelAnalyzer', () => {
   let analyzer: DataModelAnalyzer;
 
   beforeEach(() => {
     analyzer = new DataModelAnalyzer();
   });
 
-  describe("findDataModel", () => {
-    it("should return null for non-data-model nodes", () => {
+  describe('findDataModel', () => {
+    it('should return null for non-data-model nodes', () => {
       const code = `function test() { return 42; }`;
       const ast = parser.parse(code, {
-        sourceType: "module",
-        plugins: ["typescript"],
+        sourceType: 'module',
+        plugins: ['typescript'],
       });
 
       const node = ast.program.body[0];
@@ -30,7 +30,7 @@ describe("DataModelAnalyzer", () => {
       expect(result).toBeNull();
     });
 
-    it("should extract TypeScript interface with basic fields", () => {
+    it('should extract TypeScript interface with basic fields', () => {
       const code = `
         interface User {
           id: number;
@@ -40,40 +40,40 @@ describe("DataModelAnalyzer", () => {
         }
       `;
       const ast = parser.parse(code, {
-        sourceType: "module",
-        plugins: ["typescript"],
+        sourceType: 'module',
+        plugins: ['typescript'],
       });
 
       const node = ast.program.body[0];
       const result = analyzer.findDataModel(node);
 
       expect(result).not.toBeNull();
-      expect(result?.name).toBe("User");
+      expect(result?.name).toBe('User');
       expect(result?.type).toBe(DataModelType.INTERFACE);
       expect(result?.fields).toHaveLength(4);
       expect(result?.fields[0]).toEqual({
-        name: "id",
-        type: "number",
+        name: 'id',
+        type: 'number',
         optional: false,
       });
       expect(result?.fields[1]).toEqual({
-        name: "name",
-        type: "string",
+        name: 'name',
+        type: 'string',
         optional: false,
       });
       expect(result?.fields[2]).toEqual({
-        name: "email",
-        type: "string",
+        name: 'email',
+        type: 'string',
         optional: false,
       });
       expect(result?.fields[3]).toEqual({
-        name: "isActive",
-        type: "boolean",
+        name: 'isActive',
+        type: 'boolean',
         optional: false,
       });
     });
 
-    it("should detect optional fields in interfaces", () => {
+    it('should detect optional fields in interfaces', () => {
       const code = `
         interface Product {
           id: number;
@@ -83,8 +83,8 @@ describe("DataModelAnalyzer", () => {
         }
       `;
       const ast = parser.parse(code, {
-        sourceType: "module",
-        plugins: ["typescript"],
+        sourceType: 'module',
+        plugins: ['typescript'],
       });
 
       const node = ast.program.body[0];
@@ -98,7 +98,7 @@ describe("DataModelAnalyzer", () => {
       expect(result?.fields[3].optional).toBe(true);
     });
 
-    it("should extract TypeScript type alias with object type", () => {
+    it('should extract TypeScript type alias with object type', () => {
       const code = `
         type Address = {
           street: string;
@@ -108,26 +108,26 @@ describe("DataModelAnalyzer", () => {
         };
       `;
       const ast = parser.parse(code, {
-        sourceType: "module",
-        plugins: ["typescript"],
+        sourceType: 'module',
+        plugins: ['typescript'],
       });
 
       const node = ast.program.body[0];
       const result = analyzer.findDataModel(node);
 
       expect(result).not.toBeNull();
-      expect(result?.name).toBe("Address");
+      expect(result?.name).toBe('Address');
       expect(result?.type).toBe(DataModelType.TYPE);
       expect(result?.fields).toHaveLength(4);
-      expect(result?.fields[0].name).toBe("street");
-      expect(result?.fields[0].type).toBe("string");
+      expect(result?.fields[0].name).toBe('street');
+      expect(result?.fields[0].type).toBe('string');
     });
 
-    it("should return null for type alias with non-object type", () => {
+    it('should return null for type alias with non-object type', () => {
       const code = `type ID = string | number;`;
       const ast = parser.parse(code, {
-        sourceType: "module",
-        plugins: ["typescript"],
+        sourceType: 'module',
+        plugins: ['typescript'],
       });
 
       const node = ast.program.body[0];
@@ -136,7 +136,7 @@ describe("DataModelAnalyzer", () => {
       expect(result).toBeNull();
     });
 
-    it("should extract class declaration with properties", () => {
+    it('should extract class declaration with properties', () => {
       const code = `
         class Customer {
           id: number;
@@ -145,23 +145,23 @@ describe("DataModelAnalyzer", () => {
         }
       `;
       const ast = parser.parse(code, {
-        sourceType: "module",
-        plugins: ["typescript"],
+        sourceType: 'module',
+        plugins: ['typescript'],
       });
 
       const node = ast.program.body[0];
       const result = analyzer.findDataModel(node);
 
       expect(result).not.toBeNull();
-      expect(result?.name).toBe("Customer");
+      expect(result?.name).toBe('Customer');
       expect(result?.type).toBe(DataModelType.CLASS);
       expect(result?.fields).toHaveLength(3);
-      expect(result?.fields[0].name).toBe("id");
-      expect(result?.fields[1].name).toBe("name");
-      expect(result?.fields[2].name).toBe("email");
+      expect(result?.fields[0].name).toBe('id');
+      expect(result?.fields[1].name).toBe('name');
+      expect(result?.fields[2].name).toBe('email');
     });
 
-    it("should return null for class without properties", () => {
+    it('should return null for class without properties', () => {
       const code = `
         class Service {
           constructor() {}
@@ -169,8 +169,8 @@ describe("DataModelAnalyzer", () => {
         }
       `;
       const ast = parser.parse(code, {
-        sourceType: "module",
-        plugins: ["typescript"],
+        sourceType: 'module',
+        plugins: ['typescript'],
       });
 
       const node = ast.program.body[0];
@@ -179,7 +179,7 @@ describe("DataModelAnalyzer", () => {
       expect(result).toBeNull();
     });
 
-    it("should handle complex types in fields", () => {
+    it('should handle complex types in fields', () => {
       const code = `
         interface Order {
           id: number;
@@ -190,8 +190,8 @@ describe("DataModelAnalyzer", () => {
         }
       `;
       const ast = parser.parse(code, {
-        sourceType: "module",
-        plugins: ["typescript"],
+        sourceType: 'module',
+        plugins: ['typescript'],
       });
 
       const node = ast.program.body[0];
@@ -199,15 +199,13 @@ describe("DataModelAnalyzer", () => {
 
       expect(result).not.toBeNull();
       expect(result?.fields).toHaveLength(5);
-      expect(result?.fields[1].type).toBe("string[]");
-      expect(result?.fields[2].type).toBe("Customer");
-      expect(result?.fields[3].type).toBe(
-        '"pending" | "completed" | "cancelled"',
-      );
-      expect(result?.fields[4].type).toBe("object");
+      expect(result?.fields[1].type).toBe('string[]');
+      expect(result?.fields[2].type).toBe('Customer');
+      expect(result?.fields[3].type).toBe('"pending" | "completed" | "cancelled"');
+      expect(result?.fields[4].type).toBe('object');
     });
 
-    it("should handle exported interfaces", () => {
+    it('should handle exported interfaces', () => {
       const code = `
         export interface Config {
           apiKey: string;
@@ -215,20 +213,20 @@ describe("DataModelAnalyzer", () => {
         }
       `;
       const ast = parser.parse(code, {
-        sourceType: "module",
-        plugins: ["typescript"],
+        sourceType: 'module',
+        plugins: ['typescript'],
       });
 
       const node = ast.program.body[0];
       const result = analyzer.findDataModel(node);
 
       expect(result).not.toBeNull();
-      expect(result?.name).toBe("Config");
+      expect(result?.name).toBe('Config');
       expect(result?.type).toBe(DataModelType.INTERFACE);
       expect(result?.fields).toHaveLength(2);
     });
 
-    it("should handle exported type aliases", () => {
+    it('should handle exported type aliases', () => {
       const code = `
         export type Settings = {
           theme: string;
@@ -236,19 +234,19 @@ describe("DataModelAnalyzer", () => {
         };
       `;
       const ast = parser.parse(code, {
-        sourceType: "module",
-        plugins: ["typescript"],
+        sourceType: 'module',
+        plugins: ['typescript'],
       });
 
       const node = ast.program.body[0];
       const result = analyzer.findDataModel(node);
 
       expect(result).not.toBeNull();
-      expect(result?.name).toBe("Settings");
+      expect(result?.name).toBe('Settings');
       expect(result?.type).toBe(DataModelType.TYPE);
     });
 
-    it("should handle exported classes", () => {
+    it('should handle exported classes', () => {
       const code = `
         export class Entity {
           id: string;
@@ -256,39 +254,39 @@ describe("DataModelAnalyzer", () => {
         }
       `;
       const ast = parser.parse(code, {
-        sourceType: "module",
-        plugins: ["typescript"],
+        sourceType: 'module',
+        plugins: ['typescript'],
       });
 
       const node = ast.program.body[0];
       const result = analyzer.findDataModel(node);
 
       expect(result).not.toBeNull();
-      expect(result?.name).toBe("Entity");
+      expect(result?.name).toBe('Entity');
       expect(result?.type).toBe(DataModelType.CLASS);
     });
 
-    it("should handle fields with any type when no annotation", () => {
+    it('should handle fields with any type when no annotation', () => {
       const code = `
         interface Data {
           value;
         }
       `;
       const ast = parser.parse(code, {
-        sourceType: "module",
-        plugins: ["typescript"],
+        sourceType: 'module',
+        plugins: ['typescript'],
       });
 
       const node = ast.program.body[0];
       const result = analyzer.findDataModel(node);
 
       expect(result).not.toBeNull();
-      expect(result?.fields[0].type).toBe("any");
+      expect(result?.fields[0].type).toBe('any');
     });
   });
 
-  describe("parsePrismaSchema", () => {
-    it("should parse a simple Prisma model with scalar fields", () => {
+  describe('parsePrismaSchema', () => {
+    it('should parse a simple Prisma model with scalar fields', () => {
       const analyzer = new DataModelAnalyzer();
       const schemaContent = `
 model User {
@@ -299,34 +297,34 @@ model User {
       `;
 
       // Create a temporary file for testing
-      const fs = require("fs");
-      const path = require("path");
-      const tmpFile = path.join(__dirname, "test-schema.prisma");
+      const fs = require('fs');
+      const path = require('path');
+      const tmpFile = path.join(__dirname, 'test-schema.prisma');
       fs.writeFileSync(tmpFile, schemaContent);
 
       try {
         const models = analyzer.parsePrismaSchema(tmpFile);
 
         expect(models).toHaveLength(1);
-        expect(models[0].name).toBe("User");
+        expect(models[0].name).toBe('User');
         expect(models[0].type).toBe(DataModelType.PRISMA);
         expect(models[0].fields).toHaveLength(3);
 
         expect(models[0].fields[0]).toEqual({
-          name: "id",
-          type: "Int",
+          name: 'id',
+          type: 'Int',
           optional: false,
         });
 
         expect(models[0].fields[1]).toEqual({
-          name: "name",
-          type: "String",
+          name: 'name',
+          type: 'String',
           optional: false,
         });
 
         expect(models[0].fields[2]).toEqual({
-          name: "email",
-          type: "String",
+          name: 'email',
+          type: 'String',
           optional: false,
         });
 
@@ -336,19 +334,19 @@ model User {
 
         // Check for @id validation
         const idValidation = models[0].validations?.find(
-          (v) => v.field === "id" && v.rule === "id",
+          (v) => v.field === 'id' && v.rule === 'id'
         );
         expect(idValidation).toBeDefined();
 
         // Check for @unique validation
         const uniqueValidation = models[0].validations?.find(
-          (v) => v.field === "email" && v.rule === "unique",
+          (v) => v.field === 'email' && v.rule === 'unique'
         );
         expect(uniqueValidation).toBeDefined();
 
         // Check for @default validation
         const defaultValidation = models[0].validations?.find(
-          (v) => v.field === "id" && v.rule === "default",
+          (v) => v.field === 'id' && v.rule === 'default'
         );
         expect(defaultValidation).toBeDefined();
       } finally {
@@ -357,7 +355,7 @@ model User {
       }
     });
 
-    it("should parse optional fields in Prisma models", () => {
+    it('should parse optional fields in Prisma models', () => {
       const analyzer = new DataModelAnalyzer();
       const schemaContent = `
 model Profile {
@@ -368,9 +366,9 @@ model Profile {
 }
       `;
 
-      const fs = require("fs");
-      const path = require("path");
-      const tmpFile = path.join(__dirname, "test-schema2.prisma");
+      const fs = require('fs');
+      const path = require('path');
+      const tmpFile = path.join(__dirname, 'test-schema2.prisma');
       fs.writeFileSync(tmpFile, schemaContent);
 
       try {
@@ -388,7 +386,7 @@ model Profile {
       }
     });
 
-    it("should parse array fields (one-to-many relationships)", () => {
+    it('should parse array fields (one-to-many relationships)', () => {
       const analyzer = new DataModelAnalyzer();
       const schemaContent = `
 model User {
@@ -397,9 +395,9 @@ model User {
 }
       `;
 
-      const fs = require("fs");
-      const path = require("path");
-      const tmpFile = path.join(__dirname, "test-schema3.prisma");
+      const fs = require('fs');
+      const path = require('path');
+      const tmpFile = path.join(__dirname, 'test-schema3.prisma');
       fs.writeFileSync(tmpFile, schemaContent);
 
       try {
@@ -408,21 +406,21 @@ model User {
         expect(models).toHaveLength(1);
         expect(models[0].fields).toHaveLength(2);
 
-        expect(models[0].fields[1].name).toBe("posts");
-        expect(models[0].fields[1].type).toBe("Post[]");
+        expect(models[0].fields[1].name).toBe('posts');
+        expect(models[0].fields[1].type).toBe('Post[]');
         expect(models[0].fields[1].optional).toBe(false);
 
         // Check relationships
         expect(models[0].relationships).toBeDefined();
         expect(models[0].relationships?.length).toBe(1);
-        expect(models[0].relationships?.[0].type).toBe("one-to-many");
-        expect(models[0].relationships?.[0].target).toBe("Post");
+        expect(models[0].relationships?.[0].type).toBe('one-to-many');
+        expect(models[0].relationships?.[0].target).toBe('Post');
       } finally {
         fs.unlinkSync(tmpFile);
       }
     });
 
-    it("should parse explicit relationships with @relation", () => {
+    it('should parse explicit relationships with @relation', () => {
       const analyzer = new DataModelAnalyzer();
       const schemaContent = `
 model Post {
@@ -433,9 +431,9 @@ model Post {
 }
       `;
 
-      const fs = require("fs");
-      const path = require("path");
-      const tmpFile = path.join(__dirname, "test-schema4.prisma");
+      const fs = require('fs');
+      const path = require('path');
+      const tmpFile = path.join(__dirname, 'test-schema4.prisma');
       fs.writeFileSync(tmpFile, schemaContent);
 
       try {
@@ -447,15 +445,15 @@ model Post {
         // Check relationships
         expect(models[0].relationships).toBeDefined();
         expect(models[0].relationships?.length).toBe(1);
-        expect(models[0].relationships?.[0].type).toBe("one-to-one");
-        expect(models[0].relationships?.[0].target).toBe("User");
-        expect(models[0].relationships?.[0].foreignKey).toBe("authorId");
+        expect(models[0].relationships?.[0].type).toBe('one-to-one');
+        expect(models[0].relationships?.[0].target).toBe('User');
+        expect(models[0].relationships?.[0].foreignKey).toBe('authorId');
       } finally {
         fs.unlinkSync(tmpFile);
       }
     });
 
-    it("should parse multiple models in a schema", () => {
+    it('should parse multiple models in a schema', () => {
       const analyzer = new DataModelAnalyzer();
       const schemaContent = `
 model User {
@@ -478,24 +476,24 @@ model Comment {
 }
       `;
 
-      const fs = require("fs");
-      const path = require("path");
-      const tmpFile = path.join(__dirname, "test-schema5.prisma");
+      const fs = require('fs');
+      const path = require('path');
+      const tmpFile = path.join(__dirname, 'test-schema5.prisma');
       fs.writeFileSync(tmpFile, schemaContent);
 
       try {
         const models = analyzer.parsePrismaSchema(tmpFile);
 
         expect(models).toHaveLength(3);
-        expect(models[0].name).toBe("User");
-        expect(models[1].name).toBe("Post");
-        expect(models[2].name).toBe("Comment");
+        expect(models[0].name).toBe('User');
+        expect(models[1].name).toBe('Post');
+        expect(models[2].name).toBe('Comment');
       } finally {
         fs.unlinkSync(tmpFile);
       }
     });
 
-    it("should handle one-to-one relationships with optional fields", () => {
+    it('should handle one-to-one relationships with optional fields', () => {
       const analyzer = new DataModelAnalyzer();
       const schemaContent = `
 model User {
@@ -504,9 +502,9 @@ model User {
 }
       `;
 
-      const fs = require("fs");
-      const path = require("path");
-      const tmpFile = path.join(__dirname, "test-schema6.prisma");
+      const fs = require('fs');
+      const path = require('path');
+      const tmpFile = path.join(__dirname, 'test-schema6.prisma');
       fs.writeFileSync(tmpFile, schemaContent);
 
       try {
@@ -517,14 +515,14 @@ model User {
 
         // Check relationships
         expect(models[0].relationships).toBeDefined();
-        expect(models[0].relationships?.[0].type).toBe("one-to-one");
-        expect(models[0].relationships?.[0].target).toBe("Profile");
+        expect(models[0].relationships?.[0].type).toBe('one-to-one');
+        expect(models[0].relationships?.[0].target).toBe('Profile');
       } finally {
         fs.unlinkSync(tmpFile);
       }
     });
 
-    it("should handle all Prisma scalar types", () => {
+    it('should handle all Prisma scalar types', () => {
       const analyzer = new DataModelAnalyzer();
       const schemaContent = `
 model AllTypes {
@@ -540,9 +538,9 @@ model AllTypes {
 }
       `;
 
-      const fs = require("fs");
-      const path = require("path");
-      const tmpFile = path.join(__dirname, "test-schema7.prisma");
+      const fs = require('fs');
+      const path = require('path');
+      const tmpFile = path.join(__dirname, 'test-schema7.prisma');
       fs.writeFileSync(tmpFile, schemaContent);
 
       try {
@@ -555,28 +553,28 @@ model AllTypes {
         expect(models[0].relationships).toBeUndefined();
 
         // Verify types
-        expect(models[0].fields[0].type).toBe("Int");
-        expect(models[0].fields[1].type).toBe("String");
-        expect(models[0].fields[2].type).toBe("Boolean");
-        expect(models[0].fields[3].type).toBe("BigInt");
-        expect(models[0].fields[4].type).toBe("Float");
-        expect(models[0].fields[5].type).toBe("Decimal");
-        expect(models[0].fields[6].type).toBe("DateTime");
-        expect(models[0].fields[7].type).toBe("Json");
-        expect(models[0].fields[8].type).toBe("Bytes");
+        expect(models[0].fields[0].type).toBe('Int');
+        expect(models[0].fields[1].type).toBe('String');
+        expect(models[0].fields[2].type).toBe('Boolean');
+        expect(models[0].fields[3].type).toBe('BigInt');
+        expect(models[0].fields[4].type).toBe('Float');
+        expect(models[0].fields[5].type).toBe('Decimal');
+        expect(models[0].fields[6].type).toBe('DateTime');
+        expect(models[0].fields[7].type).toBe('Json');
+        expect(models[0].fields[8].type).toBe('Bytes');
       } finally {
         fs.unlinkSync(tmpFile);
       }
     });
 
-    it("should return empty array for non-existent file", () => {
+    it('should return empty array for non-existent file', () => {
       const analyzer = new DataModelAnalyzer();
-      const models = analyzer.parsePrismaSchema("/non/existent/file.prisma");
+      const models = analyzer.parsePrismaSchema('/non/existent/file.prisma');
 
       expect(models).toEqual([]);
     });
 
-    it("should handle schema with comments", () => {
+    it('should handle schema with comments', () => {
       const analyzer = new DataModelAnalyzer();
       const schemaContent = `
 // User model
@@ -591,9 +589,9 @@ model User {
 }
       `;
 
-      const fs = require("fs");
-      const path = require("path");
-      const tmpFile = path.join(__dirname, "test-schema8.prisma");
+      const fs = require('fs');
+      const path = require('path');
+      const tmpFile = path.join(__dirname, 'test-schema8.prisma');
       fs.writeFileSync(tmpFile, schemaContent);
 
       try {

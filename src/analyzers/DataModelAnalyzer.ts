@@ -6,7 +6,7 @@
  * names, types, and optional flags.
  */
 
-import * as fs from "fs";
+import * as fs from 'fs';
 import {
   DataModel,
   DataModelType,
@@ -14,7 +14,7 @@ import {
   Relationship,
   RelationshipType,
   Validation,
-} from "../types";
+} from '../types.js';
 
 /**
  * Analyzer for extracting data model information from AST nodes
@@ -33,29 +33,29 @@ export class DataModelAnalyzer {
    */
   findDataModel(node: any): DataModel | null {
     // Check for TypeScript interface
-    if (node.type === "TSInterfaceDeclaration") {
+    if (node.type === 'TSInterfaceDeclaration') {
       return this.extractInterfaceModel(node);
     }
 
     // Check for TypeScript type alias
-    if (node.type === "TSTypeAliasDeclaration") {
+    if (node.type === 'TSTypeAliasDeclaration') {
       return this.extractTypeAliasModel(node);
     }
 
     // Check for class declaration with properties
-    if (node.type === "ClassDeclaration") {
+    if (node.type === 'ClassDeclaration') {
       return this.extractClassModel(node);
     }
 
     // Check for exported interface
-    if (node.type === "ExportNamedDeclaration" && node.declaration) {
-      if (node.declaration.type === "TSInterfaceDeclaration") {
+    if (node.type === 'ExportNamedDeclaration' && node.declaration) {
+      if (node.declaration.type === 'TSInterfaceDeclaration') {
         return this.extractInterfaceModel(node.declaration);
       }
-      if (node.declaration.type === "TSTypeAliasDeclaration") {
+      if (node.declaration.type === 'TSTypeAliasDeclaration') {
         return this.extractTypeAliasModel(node.declaration);
       }
-      if (node.declaration.type === "ClassDeclaration") {
+      if (node.declaration.type === 'ClassDeclaration') {
         return this.extractClassModel(node.declaration);
       }
     }
@@ -80,7 +80,7 @@ export class DataModelAnalyzer {
     // Extract fields from interface body
     if (node.body && node.body.body) {
       for (const member of node.body.body) {
-        if (member.type === "TSPropertySignature") {
+        if (member.type === 'TSPropertySignature') {
           const field = this.extractPropertyField(member);
           if (field) {
             fields.push(field);
@@ -111,10 +111,10 @@ export class DataModelAnalyzer {
     const fields: ModelField[] = [];
 
     // Only process type aliases that define object types
-    if (node.typeAnnotation && node.typeAnnotation.type === "TSTypeLiteral") {
+    if (node.typeAnnotation && node.typeAnnotation.type === 'TSTypeLiteral') {
       if (node.typeAnnotation.members) {
         for (const member of node.typeAnnotation.members) {
-          if (member.type === "TSPropertySignature") {
+          if (member.type === 'TSPropertySignature') {
             const field = this.extractPropertyField(member);
             if (field) {
               fields.push(field);
@@ -150,7 +150,7 @@ export class DataModelAnalyzer {
     // Extract properties from class body
     if (node.body && node.body.body) {
       for (const member of node.body.body) {
-        if (member.type === "ClassProperty") {
+        if (member.type === 'ClassProperty') {
           const field = this.extractClassPropertyField(member);
           if (field) {
             fields.push(field);
@@ -183,10 +183,10 @@ export class DataModelAnalyzer {
     }
 
     // Extract field name
-    let name = "unknown";
-    if (member.key.type === "Identifier") {
+    let name = 'unknown';
+    if (member.key.type === 'Identifier') {
       name = member.key.name;
-    } else if (member.key.type === "StringLiteral") {
+    } else if (member.key.type === 'StringLiteral') {
       name = member.key.value;
     }
 
@@ -194,7 +194,7 @@ export class DataModelAnalyzer {
     const optional = member.optional === true;
 
     // Extract type annotation
-    let type = "any";
+    let type = 'any';
     if (member.typeAnnotation) {
       type = this.extractTypeAnnotation(member.typeAnnotation);
     }
@@ -218,10 +218,10 @@ export class DataModelAnalyzer {
     }
 
     // Extract field name
-    let name = "unknown";
-    if (member.key.type === "Identifier") {
+    let name = 'unknown';
+    if (member.key.type === 'Identifier') {
       name = member.key.name;
-    } else if (member.key.type === "StringLiteral") {
+    } else if (member.key.type === 'StringLiteral') {
       name = member.key.value;
     }
 
@@ -229,7 +229,7 @@ export class DataModelAnalyzer {
     const optional = member.optional === true;
 
     // Extract type annotation
-    let type = "any";
+    let type = 'any';
     if (member.typeAnnotation) {
       type = this.extractTypeAnnotation(member.typeAnnotation);
     }
@@ -253,73 +253,69 @@ export class DataModelAnalyzer {
    */
   private extractTypeAnnotation(typeAnnotation: any): string {
     if (!typeAnnotation) {
-      return "any";
+      return 'any';
     }
 
     // Handle TSTypeAnnotation wrapper
     const typeNode = typeAnnotation.typeAnnotation || typeAnnotation;
 
     switch (typeNode.type) {
-      case "TSStringKeyword":
-        return "string";
-      case "TSNumberKeyword":
-        return "number";
-      case "TSBooleanKeyword":
-        return "boolean";
-      case "TSAnyKeyword":
-        return "any";
-      case "TSVoidKeyword":
-        return "void";
-      case "TSNullKeyword":
-        return "null";
-      case "TSUndefinedKeyword":
-        return "undefined";
-      case "TSUnknownKeyword":
-        return "unknown";
-      case "TSNeverKeyword":
-        return "never";
-      case "TSObjectKeyword":
-        return "object";
-      case "TSArrayType":
+      case 'TSStringKeyword':
+        return 'string';
+      case 'TSNumberKeyword':
+        return 'number';
+      case 'TSBooleanKeyword':
+        return 'boolean';
+      case 'TSAnyKeyword':
+        return 'any';
+      case 'TSVoidKeyword':
+        return 'void';
+      case 'TSNullKeyword':
+        return 'null';
+      case 'TSUndefinedKeyword':
+        return 'undefined';
+      case 'TSUnknownKeyword':
+        return 'unknown';
+      case 'TSNeverKeyword':
+        return 'never';
+      case 'TSObjectKeyword':
+        return 'object';
+      case 'TSArrayType':
         return `${this.extractTypeAnnotation(typeNode.elementType)}[]`;
-      case "TSTypeReference":
+      case 'TSTypeReference':
         if (typeNode.typeName) {
           // Handle simple type references
-          if (typeNode.typeName.type === "Identifier") {
+          if (typeNode.typeName.type === 'Identifier') {
             return typeNode.typeName.name;
           }
           // Handle qualified names (e.g., Namespace.Type)
-          if (typeNode.typeName.type === "TSQualifiedName") {
+          if (typeNode.typeName.type === 'TSQualifiedName') {
             return this.extractQualifiedName(typeNode.typeName);
           }
         }
-        return "unknown";
-      case "TSUnionType":
+        return 'unknown';
+      case 'TSUnionType':
         if (typeNode.types) {
-          return typeNode.types
-            .map((t: any) => this.extractTypeAnnotation(t))
-            .join(" | ");
+          return typeNode.types.map((t: any) => this.extractTypeAnnotation(t)).join(' | ');
         }
-        return "unknown";
-      case "TSIntersectionType":
+        return 'unknown';
+      case 'TSIntersectionType':
         if (typeNode.types) {
-          return typeNode.types
-            .map((t: any) => this.extractTypeAnnotation(t))
-            .join(" & ");
+          return typeNode.types.map((t: any) => this.extractTypeAnnotation(t)).join(' & ');
         }
-        return "unknown";
-      case "TSFunctionType":
-        return "Function";
-      case "TSTypeLiteral":
-        return "object";
-      case "TSLiteralType":
+        return 'unknown';
+      case 'TSFunctionType':
+        return 'Function';
+      case 'TSTypeLiteral':
+        return 'object';
+      case 'TSLiteralType':
         // Handle literal types (e.g., "literal" | 123 | true)
         if (typeNode.literal) {
           return this.extractLiteralType(typeNode.literal);
         }
-        return "unknown";
+        return 'unknown';
       default:
-        return "any";
+        return 'any';
     }
   }
 
@@ -334,12 +330,12 @@ export class DataModelAnalyzer {
     let current = node;
 
     while (current) {
-      if (current.type === "TSQualifiedName") {
+      if (current.type === 'TSQualifiedName') {
         if (current.right && current.right.name) {
           parts.unshift(current.right.name);
         }
         current = current.left;
-      } else if (current.type === "Identifier") {
+      } else if (current.type === 'Identifier') {
         parts.unshift(current.name);
         break;
       } else {
@@ -347,7 +343,7 @@ export class DataModelAnalyzer {
       }
     }
 
-    return parts.join(".");
+    return parts.join('.');
   }
 
   /**
@@ -358,16 +354,16 @@ export class DataModelAnalyzer {
    */
   private extractLiteralType(node: any): string {
     switch (node.type) {
-      case "StringLiteral":
+      case 'StringLiteral':
         return `"${node.value}"`;
-      case "NumericLiteral":
+      case 'NumericLiteral':
         return String(node.value);
-      case "BooleanLiteral":
+      case 'BooleanLiteral':
         return String(node.value);
-      case "NullLiteral":
-        return "null";
+      case 'NullLiteral':
+        return 'null';
       default:
-        return "unknown";
+        return 'unknown';
     }
   }
 
@@ -390,7 +386,7 @@ export class DataModelAnalyzer {
    */
   parsePrismaSchema(filePath: string): DataModel[] {
     try {
-      const content = fs.readFileSync(filePath, "utf-8");
+      const content = fs.readFileSync(filePath, 'utf-8');
       return this.parsePrismaSchemaContent(content);
     } catch (error) {
       console.error(`Error reading Prisma schema file ${filePath}:`, error);
@@ -439,13 +435,13 @@ export class DataModelAnalyzer {
 
     // Split body into lines and process each field
     const lines = body
-      .split("\n")
+      .split('\n')
       .map((line) => line.trim())
       .filter((line) => line.length > 0);
 
     for (const line of lines) {
       // Skip comments and empty lines
-      if (line.startsWith("//") || line.startsWith("@@")) {
+      if (line.startsWith('//') || line.startsWith('@@')) {
         continue;
       }
 
@@ -502,12 +498,12 @@ export class DataModelAnalyzer {
 
     const fieldName = fieldMatch[1];
     const fieldTypeRaw = fieldMatch[2];
-    const attributes = fieldMatch[4] || "";
+    const attributes = fieldMatch[4] || '';
 
     // Determine if field is optional or array
-    const isArray = fieldTypeRaw.endsWith("[]");
-    const isOptional = fieldTypeRaw.endsWith("?");
-    const baseType = fieldTypeRaw.replace(/[\[\]\?]/g, "");
+    const isArray = fieldTypeRaw.endsWith('[]');
+    const isOptional = fieldTypeRaw.endsWith('?');
+    const baseType = fieldTypeRaw.replace(/[\[\]\?]/g, '');
 
     // Determine field type (scalar vs relation)
     const isRelation = this.isPrismaRelationType(baseType);
@@ -526,18 +522,18 @@ export class DataModelAnalyzer {
     // Parse validations from attributes
     const validations: Validation[] = [];
 
-    if (attributes.includes("@unique")) {
+    if (attributes.includes('@unique')) {
       validations.push({
         field: fieldName,
-        rule: "unique",
+        rule: 'unique',
         message: `${fieldName} must be unique`,
       });
     }
 
-    if (attributes.includes("@id")) {
+    if (attributes.includes('@id')) {
       validations.push({
         field: fieldName,
-        rule: "id",
+        rule: 'id',
         message: `${fieldName} is the primary key`,
       });
     }
@@ -547,7 +543,7 @@ export class DataModelAnalyzer {
     if (defaultMatch) {
       validations.push({
         field: fieldName,
-        rule: "default",
+        rule: 'default',
         message: `Default value: ${defaultMatch[1]}`,
       });
     }
@@ -620,15 +616,15 @@ export class DataModelAnalyzer {
    */
   private isPrismaRelationType(type: string): boolean {
     const scalarTypes = [
-      "String",
-      "Boolean",
-      "Int",
-      "BigInt",
-      "Float",
-      "Decimal",
-      "DateTime",
-      "Json",
-      "Bytes",
+      'String',
+      'Boolean',
+      'Int',
+      'BigInt',
+      'Float',
+      'Decimal',
+      'DateTime',
+      'Json',
+      'Bytes',
     ];
 
     return !scalarTypes.includes(type);

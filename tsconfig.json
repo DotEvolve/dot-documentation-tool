@@ -1,8 +1,9 @@
 {
   "compilerOptions": {
-    "target": "ES2020",
-    "module": "commonjs",
-    "lib": ["ES2020"],
+    "target": "ES2025",
+    "module": "NodeNext",
+    "moduleResolution": "NodeNext",
+    "lib": ["ES2025"],
     "outDir": "./dist",
     "rootDir": "./src",
     "strict": true,
@@ -17,7 +18,7 @@
     "noUnusedParameters": true,
     "noImplicitReturns": true,
     "noFallthroughCasesInSwitch": true,
-    "moduleResolution": "node"
+    "types": ["node", "jest"]
   },
   "include": ["src/**/*"],
   "exclude": ["node_modules", "dist", "__tests__"]
