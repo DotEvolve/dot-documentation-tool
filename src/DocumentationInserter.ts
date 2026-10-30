@@ -1,5 +1,5 @@
-import * as fs from "fs";
-import { Documentation } from "./types";
+import * as fs from 'fs';
+import { Documentation } from './types.js';
 
 /**
  * Represents existing documentation found in a file
@@ -23,8 +23,8 @@ export class DocumentationInserter {
    */
   insertDocumentation(filePath: string, docs: Documentation[]): void {
     // Read file content
-    const content = fs.readFileSync(filePath, "utf-8");
-    const lines = content.split("\n");
+    const content = fs.readFileSync(filePath, 'utf-8');
+    const lines = content.split('\n');
 
     // Detect existing documentation
     const existingDocs = this.detectExistingDocs(filePath);
@@ -36,24 +36,21 @@ export class DocumentationInserter {
 
     // Sort docs by line number in reverse order to maintain line numbers
     const sortedDocs = [...docsToInsert].sort(
-      (a, b) => b.insertionPoint.line - a.insertionPoint.line,
+      (a, b) => b.insertionPoint.line - a.insertionPoint.line
     );
 
     // Insert each documentation
     for (const doc of sortedDocs) {
       const insertLine = doc.insertionPoint.line;
       const indentation = this.getIndentation(lines, insertLine);
-      const formattedComment = this.formatWithIndentation(
-        doc.formattedComment,
-        indentation,
-      );
+      const formattedComment = this.formatWithIndentation(doc.formattedComment, indentation);
 
       // Insert the comment before the target line
       lines.splice(insertLine, 0, formattedComment);
     }
 
     // Write back to file
-    fs.writeFileSync(filePath, lines.join("\n"), "utf-8");
+    fs.writeFileSync(filePath, lines.join('\n'), 'utf-8');
   }
 
   /**
@@ -62,8 +59,8 @@ export class DocumentationInserter {
    * @returns Array of existing documentation locations
    */
   detectExistingDocs(filePath: string): ExistingDoc[] {
-    const content = fs.readFileSync(filePath, "utf-8");
-    const lines = content.split("\n");
+    const content = fs.readFileSync(filePath, 'utf-8');
+    const lines = content.split('\n');
     const existingDocs: ExistingDoc[] = [];
 
     let inComment = false;
@@ -73,24 +70,22 @@ export class DocumentationInserter {
     for (let i = 0; i < lines.length; i++) {
       const line = lines[i].trim();
 
-      if (line.startsWith("/**")) {
+      if (line.startsWith('/**')) {
         inComment = true;
         commentStart = i;
         commentLines = [line];
       } else if (inComment) {
         commentLines.push(line);
-        if (line.includes("*/")) {
+        if (line.includes('*/')) {
           inComment = false;
 
           // Try to extract element name from next non-empty line
           let elementName: string | undefined;
           for (let j = i + 1; j < lines.length; j++) {
             const nextLine = lines[j].trim();
-            if (nextLine && !nextLine.startsWith("//")) {
+            if (nextLine && !nextLine.startsWith('//')) {
               // Extract function/class/const name
-              const match = nextLine.match(
-                /(?:function|class|const|let|var|export)\s+(\w+)/,
-              );
+              const match = nextLine.match(/(?:function|class|const|let|var|export)\s+(\w+)/);
               if (match) {
                 elementName = match[1];
               }
@@ -100,7 +95,7 @@ export class DocumentationInserter {
 
           existingDocs.push({
             line: commentStart,
-            content: commentLines.join("\n"),
+            content: commentLines.join('\n'),
             elementName,
           });
           commentLines = [];
@@ -117,10 +112,7 @@ export class DocumentationInserter {
    * @param existingDocs - Array of existing documentation
    * @returns True if there's a conflict
    */
-  private hasConflict(
-    doc: Documentation,
-    existingDocs: ExistingDoc[],
-  ): boolean {
+  private hasConflict(doc: Documentation, existingDocs: ExistingDoc[]): boolean {
     const targetLine = doc.insertionPoint.line;
     const elementName = doc.element.name;
 
@@ -132,7 +124,7 @@ export class DocumentationInserter {
         if (existing.elementName === elementName) {
           console.warn(
             `Skipping documentation for ${elementName} at line ${targetLine}: ` +
-              `existing documentation found at line ${existing.line}`,
+              `existing documentation found at line ${existing.line}`
           );
           return true;
         }
@@ -150,12 +142,12 @@ export class DocumentationInserter {
    */
   private getIndentation(lines: string[], lineNumber: number): string {
     if (lineNumber >= lines.length) {
-      return "";
+      return '';
     }
 
     const line = lines[lineNumber];
     const match = line.match(/^(\s*)/);
-    return match ? match[1] : "";
+    return match ? match[1] : '';
   }
 
   /**
@@ -165,7 +157,7 @@ export class DocumentationInserter {
    * @returns Formatted comment with indentation
    */
   private formatWithIndentation(comment: string, indentation: string): string {
-    const lines = comment.split("\n");
-    return lines.map((line) => indentation + line).join("\n");
+    const lines = comment.split('\n');
+    return lines.map((line) => indentation + line).join('\n');
   }
 }

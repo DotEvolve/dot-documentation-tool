@@ -5,7 +5,7 @@
  * Handles Chrome APIs, content scripts, message passing, and authentication sync.
  */
 
-import { CodeElement, JSDoc, ParamDoc } from "../types";
+import { CodeElement, JSDoc, ParamDoc } from '../types.js';
 
 /**
  * Generates specialized documentation for Chrome Extension components
@@ -52,11 +52,11 @@ export function generateExtensionDoc(element: CodeElement): JSDoc {
 function isChromeAPI(element: CodeElement): boolean {
   const name = element.name.toLowerCase();
   return (
-    name.includes("chrome") ||
-    name.includes("browser") ||
-    name.includes("extension") ||
-    name.includes("storage") ||
-    name.includes("tabs")
+    name.includes('chrome') ||
+    name.includes('browser') ||
+    name.includes('extension') ||
+    name.includes('storage') ||
+    name.includes('tabs')
   );
 }
 
@@ -69,10 +69,10 @@ function isChromeAPI(element: CodeElement): boolean {
 function isContentScript(element: CodeElement): boolean {
   const name = element.name.toLowerCase();
   return (
-    name.includes("content") ||
-    name.includes("inject") ||
-    name.includes("dom") ||
-    name.includes("page")
+    name.includes('content') ||
+    name.includes('inject') ||
+    name.includes('dom') ||
+    name.includes('page')
   );
 }
 
@@ -85,10 +85,10 @@ function isContentScript(element: CodeElement): boolean {
 function isMessagePassing(element: CodeElement): boolean {
   const name = element.name.toLowerCase();
   return (
-    name.includes("message") ||
-    name.includes("send") ||
-    name.includes("receive") ||
-    name.includes("listener")
+    name.includes('message') ||
+    name.includes('send') ||
+    name.includes('receive') ||
+    name.includes('listener')
   );
 }
 
@@ -101,10 +101,10 @@ function isMessagePassing(element: CodeElement): boolean {
 function isAuthSync(element: CodeElement): boolean {
   const name = element.name.toLowerCase();
   return (
-    name.includes("auth") ||
-    name.includes("token") ||
-    name.includes("session") ||
-    name.includes("sync")
+    name.includes('auth') ||
+    name.includes('token') ||
+    name.includes('session') ||
+    name.includes('sync')
   );
 }
 
@@ -116,11 +116,7 @@ function isAuthSync(element: CodeElement): boolean {
  */
 function isBackgroundScript(element: CodeElement): boolean {
   const name = element.name.toLowerCase();
-  return (
-    name.includes("background") ||
-    name.includes("service") ||
-    name.includes("worker")
-  );
+  return name.includes('background') || name.includes('service') || name.includes('worker');
 }
 
 /**
@@ -133,7 +129,7 @@ function generateChromeAPIDoc(element: CodeElement): JSDoc {
   const params: ParamDoc[] =
     element.signature?.parameters.map((p) => ({
       name: p.name,
-      type: p.type || "any",
+      type: p.type || 'any',
       description: `Chrome API parameter: ${p.name}`,
       optional: p.optional,
     })) || [];
@@ -142,19 +138,19 @@ function generateChromeAPIDoc(element: CodeElement): JSDoc {
     description: `Chrome Extension API function that interacts with browser capabilities. Provides access to browser features like storage, tabs, notifications, and more. Requires appropriate permissions in manifest.json.`,
     params,
     returns: {
-      type: element.signature?.returnType || "Promise<any>",
-      description: "Chrome API operation result",
+      type: element.signature?.returnType || 'Promise<any>',
+      description: 'Chrome API operation result',
     },
     throws: [
       {
-        type: "ChromeAPIError",
-        condition: "When Chrome API call fails or permission is denied",
+        type: 'ChromeAPIError',
+        condition: 'When Chrome API call fails or permission is denied',
       },
     ],
     tags: {
-      api: "chrome-extension",
-      browser: "chrome",
-      permissions: "required",
+      api: 'chrome-extension',
+      browser: 'chrome',
+      permissions: 'required',
     },
   };
 }
@@ -169,7 +165,7 @@ function generateContentScriptDoc(element: CodeElement): JSDoc {
   const params: ParamDoc[] =
     element.signature?.parameters.map((p) => ({
       name: p.name,
-      type: p.type || "any",
+      type: p.type || 'any',
       description: `Content script parameter: ${p.name}`,
       optional: p.optional,
     })) || [];
@@ -178,13 +174,13 @@ function generateContentScriptDoc(element: CodeElement): JSDoc {
     description: `Content script that runs in the context of web pages. Has access to the page DOM and can modify page content. Communicates with background scripts via message passing. Isolated from page JavaScript for security.`,
     params,
     returns: {
-      type: element.signature?.returnType || "void",
-      description: "Content script execution result",
+      type: element.signature?.returnType || 'void',
+      description: 'Content script execution result',
     },
     tags: {
-      script: "content",
-      context: "page",
-      isolated: "true",
+      script: 'content',
+      context: 'page',
+      isolated: 'true',
     },
     example: `// Content script runs in page context\n// Can access and modify DOM\n// Communicates with background via chrome.runtime.sendMessage()`,
   };
@@ -200,8 +196,8 @@ function generateMessagePassingDoc(element: CodeElement): JSDoc {
   const params: ParamDoc[] =
     element.signature?.parameters.map((p) => ({
       name: p.name,
-      type: p.type || "any",
-      description: `${p.name.includes("message") ? "Message data to send/receive" : p.name.includes("sender") ? "Message sender information" : `Message passing parameter: ${p.name}`}`,
+      type: p.type || 'any',
+      description: `${p.name.includes('message') ? 'Message data to send/receive' : p.name.includes('sender') ? 'Message sender information' : `Message passing parameter: ${p.name}`}`,
       optional: p.optional,
     })) || [];
 
@@ -209,13 +205,13 @@ function generateMessagePassingDoc(element: CodeElement): JSDoc {
     description: `Message passing function for communication between extension components (background, content scripts, popup). Enables asynchronous communication with request-response pattern. Supports both one-time messages and long-lived connections.`,
     params,
     returns: {
-      type: element.signature?.returnType || "Promise<any>",
-      description: "Message response or acknowledgment",
+      type: element.signature?.returnType || 'Promise<any>',
+      description: 'Message response or acknowledgment',
     },
     tags: {
-      pattern: "message-passing",
-      async: "true",
-      communication: "inter-component",
+      pattern: 'message-passing',
+      async: 'true',
+      communication: 'inter-component',
     },
     example: `// Send message:\n// chrome.runtime.sendMessage({ type: 'ACTION', data: {...} })\n// Receive message:\n// chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {...})`,
   };
@@ -231,8 +227,8 @@ function generateAuthSyncDoc(element: CodeElement): JSDoc {
   const params: ParamDoc[] =
     element.signature?.parameters.map((p) => ({
       name: p.name,
-      type: p.type || "any",
-      description: `${p.name.includes("token") ? "Authentication token" : p.name.includes("session") ? "Session data" : `Auth sync parameter: ${p.name}`}`,
+      type: p.type || 'any',
+      description: `${p.name.includes('token') ? 'Authentication token' : p.name.includes('session') ? 'Session data' : `Auth sync parameter: ${p.name}`}`,
       optional: p.optional,
     })) || [];
 
@@ -240,23 +236,23 @@ function generateAuthSyncDoc(element: CodeElement): JSDoc {
     description: `Authentication synchronization function that keeps extension auth state in sync with web application. Stores tokens securely in chrome.storage, handles token refresh, and manages session lifecycle. Ensures seamless user experience across extension and web app.`,
     params,
     returns: {
-      type: element.signature?.returnType || "Promise<void>",
-      description: "Auth sync operation result",
+      type: element.signature?.returnType || 'Promise<void>',
+      description: 'Auth sync operation result',
     },
     throws: [
       {
-        type: "AuthSyncError",
-        condition: "When authentication sync fails",
+        type: 'AuthSyncError',
+        condition: 'When authentication sync fails',
       },
       {
-        type: "TokenExpiredError",
-        condition: "When authentication token has expired",
+        type: 'TokenExpiredError',
+        condition: 'When authentication token has expired',
       },
     ],
     tags: {
-      auth: "sync",
-      storage: "chrome.storage",
-      security: "token-management",
+      auth: 'sync',
+      storage: 'chrome.storage',
+      security: 'token-management',
     },
   };
 }
@@ -271,7 +267,7 @@ function generateBackgroundScriptDoc(element: CodeElement): JSDoc {
   const params: ParamDoc[] =
     element.signature?.parameters.map((p) => ({
       name: p.name,
-      type: p.type || "any",
+      type: p.type || 'any',
       description: `Background script parameter: ${p.name}`,
       optional: p.optional,
     })) || [];
@@ -280,13 +276,13 @@ function generateBackgroundScriptDoc(element: CodeElement): JSDoc {
     description: `Background script (service worker) that runs independently of web pages. Handles long-running operations, manages extension state, and coordinates between content scripts and popup. Persists across browser sessions.`,
     params,
     returns: {
-      type: element.signature?.returnType || "void",
-      description: "Background script operation result",
+      type: element.signature?.returnType || 'void',
+      description: 'Background script operation result',
     },
     tags: {
-      script: "background",
-      worker: "service-worker",
-      persistent: "true",
+      script: 'background',
+      worker: 'service-worker',
+      persistent: 'true',
     },
   };
 }
@@ -303,13 +299,13 @@ function generateDefaultDoc(element: CodeElement): JSDoc {
     params:
       element.signature?.parameters.map((p) => ({
         name: p.name,
-        type: p.type || "any",
+        type: p.type || 'any',
         description: `Parameter ${p.name}`,
         optional: p.optional,
       })) || [],
     returns: {
-      type: element.signature?.returnType || "void",
-      description: "Function return value",
+      type: element.signature?.returnType || 'void',
+      description: 'Function return value',
     },
   };
 }

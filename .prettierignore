@@ -1,0 +1,11 @@
+node_modules
+dist
+build
+coverage
+.husky
+.kiro
+.cline
+.continue
+*.min.js
+*.min.css
+package-lock.json
