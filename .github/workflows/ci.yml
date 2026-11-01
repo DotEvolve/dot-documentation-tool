@@ -1,15 +1,37 @@
 name: CI
 
 on:
-  push:
-    branches: [master, dev]
   pull_request:
-    branches: [master, dev]
+    branches: [dev, 'release/**', master]
+    types: [opened, synchronize, reopened, ready_for_review]
+    paths-ignore:
+      - '**.md'
+      - 'docs/**'
+      - '.github/dependabot.yml'
+      - '.gitignore'
+      - 'LICENSE'
+  push:
+    branches: [master]
+    paths-ignore:
+      - '**.md'
+      - 'docs/**'
+      - '.github/dependabot.yml'
+      - '.gitignore'
+      - 'LICENSE'
   workflow_dispatch:
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.head_ref || github.ref }}
+  cancel-in-progress: true
 
 jobs:
   build:
+    name: Build, Lint & Test
     runs-on: ubuntu-latest
+    timeout-minutes: 10
+    if: >-
+      (github.event_name != 'pull_request' || github.event.pull_request.draft == false) &&
+      !(github.event_name == 'pull_request' && github.base_ref == 'master' && github.event.action == 'synchronize')
     permissions:
       contents: read
       packages: read
