@@ -2,14 +2,14 @@ name: Publish Package
 
 on:
   push:
-    branches:
-      - master
+    branches: [master, 'release/**']
     paths-ignore:
       - '**.md'
       - 'docs/**'
       - '.github/dependabot.yml'
       - '.gitignore'
       - 'LICENSE'
+      - 'demo/**'
   workflow_dispatch:
 
 concurrency:
@@ -21,82 +21,97 @@ jobs:
     name: Publish to GitHub Packages
     runs-on: ubuntu-latest
     timeout-minutes: 10
-    environment: production
     permissions:
       contents: read
       packages: write
+
     steps:
       - uses: actions/checkout@v7
+
       - uses: actions/setup-node@v7
         with:
           node-version-file: '.node-version'
           registry-url: 'https://npm.pkg.github.com'
           scope: '@dotevolve'
+
       - name: Install dependencies
         run: npm ci
         env:
-          NPM_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          NPM_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Check Formatting
+        run: npx prettier --check . --ignore-unknown --ignore-path .prettierignore
+
       - name: Run tests
         run: npm test
+
       - name: Build package
         run: npm run build
+
       - name: Determine dist-tag & publish to GitHub Packages
         run: |
-          AUTH_TOKEN="${GITHUB_TOKEN:-$NPM_TOKEN}"
+          PACKAGE_NAME=$(node -p "require('./package.json').name")
           VERSION=$(node -p "require('./package.json').version")
           if [[ "$VERSION" =~ -(beta|alpha|rc|canary) ]] || [[ "${{ github.ref }}" =~ refs/heads/release ]]; then
             TAG="beta"
           else
             TAG="latest"
           fi
-          echo "Checking if @dotevolve/documentation-tool@$VERSION already exists on GitHub Packages..."
-          EXISTS_GH=$(npm view "@dotevolve/documentation-tool@${VERSION}" version --registry=https://npm.pkg.github.com --//npm.pkg.github.com/:_authToken="${AUTH_TOKEN}" 2>/dev/null || true)
+          echo "Checking if $PACKAGE_NAME@$VERSION already exists on GitHub Packages..."
+          EXISTS_GH=$(npm view "${PACKAGE_NAME}@${VERSION}" version --registry=https://npm.pkg.github.com 2>/dev/null || true)
           if [ "$EXISTS_GH" = "$VERSION" ]; then
             echo "Version $VERSION is already published to GitHub Packages. Skipping publish."
           else
             echo "Publishing $VERSION with dist-tag: $TAG to GitHub Packages"
-            npm publish --tag "$TAG" --//npm.pkg.github.com/:_authToken="${AUTH_TOKEN}"
+            npm publish --tag "$TAG"
           fi
         env:
-          NPM_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          NPM_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
   publish-npm-registry:
     name: Publish to Public NPM
     runs-on: ubuntu-latest
     timeout-minutes: 10
-    continue-on-error: true
+    permissions:
+      contents: read
+      id-token: write
+
     steps:
       - uses: actions/checkout@v7
+
       - uses: actions/setup-node@v7
         with:
           node-version-file: '.node-version'
           registry-url: 'https://registry.npmjs.org'
+
       - name: Remove GitHub Packages .npmrc
         run: rm -f .npmrc
+
       - name: Install dependencies
         run: npm ci
+
       - name: Run tests
         run: npm test
+
       - name: Build package
         run: npm run build
-      - name: Determine dist-tag & publish to NPM
+
+      - name: Determine dist-tag & publish to public NPM
         run: |
+          PACKAGE_NAME=$(node -p "require('./package.json').name")
           VERSION=$(node -p "require('./package.json').version")
           if [[ "$VERSION" =~ -(beta|alpha|rc|canary) ]] || [[ "${{ github.ref }}" =~ refs/heads/release ]]; then
             TAG="beta"
           else
             TAG="latest"
           fi
-          echo "Checking if @dotevolve/documentation-tool@$VERSION already exists on public npm..."
-          EXISTS_NPM=$(npm view "@dotevolve/documentation-tool@${VERSION}" version --registry=https://registry.npmjs.org 2>/dev/null || true)
+          echo "Checking if $PACKAGE_NAME@$VERSION already exists on public npm..."
+          EXISTS_NPM=$(npm view "${PACKAGE_NAME}@${VERSION}" version --registry=https://registry.npmjs.org 2>/dev/null || true)
           if [ "$EXISTS_NPM" = "$VERSION" ]; then
             echo "Version $VERSION is already published to public npm. Skipping publish."
           else
-            echo "Publishing $VERSION with dist-tag: $TAG to public npm"
-            npm publish --access public --tag "$TAG"
+            echo "Publishing $VERSION with dist-tag: $TAG via Trusted Publishers (OIDC) to public npm"
+            npm publish --provenance --access public --tag "$TAG"
           fi
-        env:
-          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
