@@ -86,9 +86,6 @@ jobs:
           node-version-file: '.node-version'
           registry-url: 'https://registry.npmjs.org'
 
-      - name: Remove GitHub Packages .npmrc
-        run: rm -f .npmrc
-
       - name: Install dependencies
         run: npm ci
 
