@@ -26,7 +26,6 @@ config.env
 
 # Explicitly Keep Config Templates & Package Registries
 !.env.example
-!.npmrc
 
 # Logs & Runtime
 logs
