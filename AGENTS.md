@@ -29,14 +29,14 @@ Commits must follow the **Conventional Commits** standard:
 ## 3. Branching Strategy & Release Lifecycle (CalVer)
 
 Strict branch flow:
-`feature/*` ──(PR)──> `dev` ──(PR)──> `release/<calver>` ──(PR)──> `master`
+`feature/*` ──(PR)──> `dev` ──(cut branch)──> `release/<calver>` ──(PR)──> `master`
 
 - **`feature/*`**: Active working branches branched from `dev` (`feat/*`, `fix/*`, `chore/*`, `docs/*`).
 - **`dev`**: Continuous integration branch deployed to development/preview environments.
-- **`release/<calver>`**: Staged release candidate branch.
+- **`release/<calver>`**: Staged release candidate branch cut from `dev`.
 - **`master`**: Production branch deployed to production environments.
 
-> **Absolute Rule**: Never commit or push directly to `dev`, `release/*`, or `master`. All updates require a Pull Request.
+> **Absolute Rule**: Never commit directly to `dev` or `master`. All updates to `dev` and `master` require a Pull Request. Creating and pushing a `release/<calver>` branch directly from `dev` is the authorized method for staging release candidates; any subsequent fixes to that release branch must be merged via PR.
 
 ### The Promotion Lifecycle:
 

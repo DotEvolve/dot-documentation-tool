@@ -18,7 +18,7 @@
     "test:watch": "jest --watch",
     "test:coverage": "jest --coverage",
     "prepare": "husky",
-    "lint": "eslint .",
+    "lint": "prettier --check .",
     "format": "prettier --write ."
   },
   "keywords": [
