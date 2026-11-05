@@ -1,15 +1,8 @@
 # Agent Development & Operations Guide
 
-## 1. Architectural Precedence & Steering Files
+## 1. Architectural Precedence
 
-Before planning or writing any code, the agent MUST inspect the repository's `.kiro/steering/` files:
-
-1. `.kiro/steering/product.md` — Domain concepts, user workflows, and business rules.
-2. `.kiro/steering/structure.md` — Architectural boundaries, directory layout, and naming conventions.
-3. `.kiro/steering/tech.md` — Language standards, framework versions, and testing tools.
-4. `.kiro/steering/deploy.md` — Tier classification, health check URLs, deployment targets, and rollback procedures.
-
-> **Precedence Rule**: Local `.kiro/steering/` files are authoritative for this repository and supersede workspace or global defaults.
+For public repositories, internal `.kiro/` specifications and steering files are excluded from version control to maintain confidentiality. Any local untracked `.kiro/` files (if present in local dev environments) or the instructions in this document serve as authoritative reference.
 
 ---
 
@@ -18,7 +11,7 @@ Before planning or writing any code, the agent MUST inspect the repository's `.k
 Before staging or committing any changes, the agent must run and pass the following checks locally:
 
 1. **Type Checking**: `npx tsc --noEmit` (or `tsc -b`) with zero TypeScript errors.
-2. **Automated Test Suite**: `npm test` (or `vitest run` / `jest`) with 100% passing tests.
+2. **Automated Test Suite**: `npm test` with 100% passing tests.
 3. **Linting & Code Style**: `npm run lint` and `npx prettier --check .` with zero errors.
 
 Commits must follow the **Conventional Commits** standard:
@@ -48,7 +41,7 @@ Strict branch flow:
    - Pull updated `dev`: `git checkout dev && git pull origin dev`.
    - Branch using CalVer format `YYYY.0M.0D`: `git checkout -b release/YYYY.0M.0D` (append `.1`, `.2` for multiple daily releases).
    - Verify full test suite passes on the release branch.
-   - Push release branch: `git push -u origin release/YYYY.0M.0D`.
+   - Push release branch to origin: `git push -u origin release/YYYY.0M.0D`.
    - Open PR targeting `master`: `gh pr create --base master --head release/YYYY.0M.0D --title "release: YYYY.0M.0D [dev -> master]" ...`.
 
 ---
@@ -97,13 +90,42 @@ Rebase and merge commits are strictly prohibited.
 
 ---
 
-## 6. Post-Merge Deployment Monitoring & Verification
+## 6. Post-Merge Deployment Monitoring & Playbook
 
 After merging into `dev` or `master`:
 
-1. The agent must monitor the post-merge GitHub Actions deployment workflow or Cloudflare Pages build.
-2. Execute the verification steps defined in `.kiro/steering/deploy.md` (e.g., container checks, HTTP 200 health endpoints, schema migrations).
-3. If verification fails, follow the **Rollback Procedures** defined in `.kiro/steering/deploy.md`.
+1. The agent must monitor the post-merge GitHub Actions deployment workflow (`publish.yml`).
+
+### Package & Registries
+
+- **Package Name**: `@dotevolve/documentation-tool`
+- **Registries**: GitHub Packages (`npm.pkg.github.com`) and public npm registry (`registry.npmjs.org`) via Trusted Publishers (OIDC)
+- **Triggers**: Automatic publication on push/merge to `master` (dist-tag: `latest`) and push to `release/**` (dist-tag: `beta`) via `.github/workflows/publish.yml`
+
+### Pre-Publish Verification
+
+```bash
+npx prettier --check .
+npm run lint
+npm test
+npm run build
+```
+
+### Version Bump Requirement
+
+The `package.json` version must be bumped prior to opening the release PR. If the version already exists in the target registry, `publish.yml` will skip publication.
+
+### Post-Merge Validation
+
+1. Monitor GitHub Actions `publish.yml` run: `gh run list --workflow=publish.yml --limit 1`
+2. Verify package versions:
+   - `npm view @dotevolve/documentation-tool version --registry=https://npm.pkg.github.com`
+   - `npm view @dotevolve/documentation-tool version --registry=https://registry.npmjs.org`
+
+### Rollback Procedure
+
+1. Never unpublish packages from registries.
+2. Publish corrective patch version: revert offending code, increment patch version, and promote to `master`.
 
 ---
 

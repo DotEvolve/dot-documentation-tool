@@ -38,6 +38,8 @@ yarn-error.log*
 .DS_Store
 Thumbs.db
 .idea/
+.kiro/
+.config.kiro
 .vscode/
 *.suo
 *.ntvs*
