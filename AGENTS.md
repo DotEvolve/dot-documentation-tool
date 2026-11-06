@@ -1,86 +1,82 @@
 # Agent Development & Operations Guide
 
-## 1. Architectural Precedence
-
-For public repositories, internal `.kiro/` specifications and steering files are excluded from version control to maintain confidentiality. Any local untracked `.kiro/` files (if present in local dev environments) or the instructions in this document serve as authoritative reference.
+## Tier: Library (`libs`)
 
 ---
 
-## 2. Pre-Commit Quality & Local Verification Gates
+## 1. Architectural Precedence & Steering Files
 
-Before staging or committing any changes, the agent must run and pass the following checks locally:
+Before planning or writing any code, inspect the repository's `.kiro/steering/` files:
 
-1. **Type Checking**: `npx tsc --noEmit` (or `tsc -b`) with zero TypeScript errors.
-2. **Automated Test Suite**: `npm test` with 100% passing tests.
-3. **Linting & Code Style**: `npm run lint` and `npx prettier --check .` with zero errors.
+1. `.kiro/steering/product.md` — Package purpose, consumers, and API contracts.
+2. `.kiro/steering/structure.md` — Source layout, entry points, and export conventions.
+3. `.kiro/steering/tech.md` — Build tooling, peer dependencies, and testing setup.
+4. `.kiro/steering/deploy.md` — Registry targets, version bump rules, and publish workflow.
 
-Commits must follow the **Conventional Commits** standard:
-`feat(<scope>): ...`, `fix(<scope>): ...`, `chore(<scope>): ...`, `docs(<scope>): ...`, `test(<scope>): ...`.
+> **Precedence Rule**: Local `.kiro/steering/` files are authoritative and supersede workspace or global defaults.
+
+---
+
+## 2. Pre-Publish Verification Gates
+
+Before staging or committing any changes, run and pass all of the following:
+
+1. **Type Checking**: `tsc -b` with zero errors.
+2. **Automated Tests**: `npm test` with 100% passing tests.
+3. **Linting & Style**: `npm run lint` and `npx prettier --check .` with zero errors.
+4. **Build**: `npm run build` — compiled output in `dist/` must be clean and complete.
+
+> **Version Bump**: The `package.json` version **must** be bumped before opening a release PR. If the version already exists in the target registry, the publish workflow will skip publication silently.
+
+Commits follow **Conventional Commits**: `feat(<scope>): ...`, `fix(<scope>): ...`, `chore(<scope>): ...`, `docs(<scope>): ...`, `test(<scope>): ...`.
 
 ---
 
 ## 3. Branching Strategy & Release Lifecycle (CalVer)
 
-Strict branch flow:
-`feature/*` ──(PR)──> `dev` ──(cut branch)──> `release/<calver>` ──(PR)──> `master`
+```
+feature/*  ──(PR)──>  dev  ──(cut)──>  release/<calver>  ──(PR)──>  master
+```
 
-- **`feature/*`**: Active working branches branched from `dev` (`feat/*`, `fix/*`, `chore/*`, `docs/*`).
-- **`dev`**: Continuous integration branch deployed to development/preview environments.
-- **`release/<calver>`**: Staged release candidate branch cut from `dev`.
-- **`master`**: Production branch deployed to production environments.
+- `feature/*` — Working branches off `dev` (`feat/*`, `fix/*`, `chore/*`, `docs/*`).
+- `dev` — Integration branch; CI runs here.
+- `release/<calver>` — Staged release candidate cut from `dev`. Format: `YYYY.0M.0D` (append `.1`, `.2` for multiple same-day releases).
+- `master` — Triggers npm publication on merge.
 
-> **Absolute Rule**: Never commit directly to `dev` or `master`. All updates to `dev` and `master` require a Pull Request. Creating and pushing a `release/<calver>` branch directly from `dev` is the authorized method for staging release candidates; any subsequent fixes to that release branch must be merged via PR.
+> **Rule**: Never commit directly to `dev` or `master`. All changes require a PR.
 
-### The Promotion Lifecycle:
+### Promotion Steps:
 
-1. **Feature Phase (`feature/*` -> `dev`)**:
-   - Branch off `dev`: `git checkout dev && git pull origin dev && git checkout -b feat/<name>`.
-   - Implement, verify locally, commit, and push: `git push -u origin feat/<name>`.
-   - Open PR targeting `dev`: `gh pr create --base dev --head feat/<name> ...`.
-2. **Release Candidate Phase (`dev` -> `release/<calver>`)**:
-   - Pull updated `dev`: `git checkout dev && git pull origin dev`.
-   - Branch using CalVer format `YYYY.0M.0D`: `git checkout -b release/YYYY.0M.0D` (append `.1`, `.2` for multiple daily releases).
-   - Verify full test suite passes on the release branch.
-   - Push release branch to origin: `git push -u origin release/YYYY.0M.0D`.
-   - Open PR targeting `master`: `gh pr create --base master --head release/YYYY.0M.0D --title "release: YYYY.0M.0D [dev -> master]" ...`.
+1. **Feature → dev**: `git checkout dev && git pull origin dev && git checkout -b feat/<name>` → implement → verify → `git push -u origin feat/<name>` → `gh pr create --base dev`.
+2. **dev → release**: `git checkout dev && git pull origin dev && git checkout -b release/YYYY.0M.0D` → bump version in `package.json` → verify full test suite → `git push -u origin release/YYYY.0M.0D` → `gh pr create --base master --title "release: YYYY.0M.0D [dev -> master]"`.
 
 ---
 
 ## 4. PR Quality Gates & Seer Remediation Loop
 
-When any Pull Request is opened:
-
-1. **Do Not Merge Immediately**: Allow automated checks and AI reviewers to complete.
-2. **Continuous Polling**:
-   - Poll checks: `gh pr checks <pr-number>`
-   - Poll review threads: `gh pr view <pr-number> --json reviews,comments`
-3. **Automated Review & Seer Remediation**:
-   - **Zero Open Comments**: All comments from human reviewers, bots (e.g. Socket Security), and Seer must be addressed.
-   - For every flagged issue: apply the fix, add automated tests, push updates, and reply on the review thread.
-   - **Thread Resolution**: Use the GitHub GraphQL API to mark the thread resolved:
-     ```bash
-     gh api graphql -f query='mutation($threadId: ID!) {
-       resolveReviewThread(input: { threadId: $threadId }) {
-         thread { isResolved }
-       }
-     }' -F threadId="<thread_id>"
-     ```
-   - Verify Seer Code Review check is green (`SUCCESS`).
+1. **Never merge immediately** — wait for CI and Seer to complete.
+2. **Poll**: `gh pr checks <pr-number>` and `gh pr view <pr-number> --json reviews,comments`.
+3. **Zero open comments** — address every comment from humans, bots (Socket Security), and Seer. Fix the code, add tests, push, reply on the thread, then resolve it:
+   ```bash
+   gh api graphql -f query='mutation($threadId: ID!) {
+     resolveReviewThread(input: { threadId: $threadId }) {
+       thread { isResolved }
+     }
+   }' -F threadId="<thread_id>"
+   ```
+4. Verify Seer Code Review is green (`SUCCESS`) before proceeding.
 
 ---
 
 ## 5. HARD GATE: Explicit Merge Authorization
 
-Even when all CI checks and Seer reviews pass with zero open comments:
+Even when all checks pass with zero open comments, **agents must never merge autonomously**.
 
-- **Agents MUST NEVER merge a PR autonomously.**
-- The agent must halt and ask the user for explicit approval:
-  > _"PR #<id> has passed all CI checks and Seer code review with zero open comments. Do you approve merging this PR into `<target-branch>`?"_
-- Only when the user responds with explicit confirmation may the agent run the merge command.
+Ask the user:
 
-### Merge Strategy:
+> _"PR #\<id\> has passed all CI checks and Seer code review with zero open comments. Do you approve merging into `<target-branch>`?"_
 
-Always merge using **Squash Merge**:
+Only after explicit user confirmation:
 
 ```bash
 gh pr merge <pr-number> --squash --delete-branch
@@ -90,48 +86,45 @@ Rebase and merge commits are strictly prohibited.
 
 ---
 
-## 6. Post-Merge Deployment Monitoring & Playbook
+## 6. Post-Merge Publication Monitoring
 
-After merging into `dev` or `master`:
+After merging to `master`:
 
-1. The agent must monitor the post-merge GitHub Actions deployment workflow (`publish.yml`).
+1. Monitor the GitHub Actions `publish.yml` workflow: `gh run list --workflow=publish.yml --limit 1`.
+2. Verify the package version is live in the target registry (see `.kiro/steering/deploy.md` for registry-specific commands).
+3. If publication fails, follow the **Rollback Procedure** in `.kiro/steering/deploy.md` (never unpublish — publish a corrective patch version).
 
-### Package & Registries
-
-- **Package Name**: `@dotevolve/documentation-tool`
-- **Registries**: GitHub Packages (`npm.pkg.github.com`) and public npm registry (`registry.npmjs.org`) via Trusted Publishers (OIDC)
-- **Triggers**: Automatic publication on push/merge to `master` (dist-tag: `latest`) and push to `release/**` (dist-tag: `beta`) via `.github/workflows/publish.yml`
-
-### Pre-Publish Verification
-
-```bash
-npx prettier --check .
-npm run lint
-npm test
-npm run build
-```
-
-### Version Bump Requirement
-
-The `package.json` version must be bumped prior to opening the release PR. If the version already exists in the target registry, `publish.yml` will skip publication.
-
-### Post-Merge Validation
-
-1. Monitor GitHub Actions `publish.yml` run: `gh run list --workflow=publish.yml --limit 1`
-2. Verify package versions:
-   - `npm view @dotevolve/documentation-tool version --registry=https://npm.pkg.github.com`
-   - `npm view @dotevolve/documentation-tool version --registry=https://registry.npmjs.org`
-
-### Rollback Procedure
-
-1. Never unpublish packages from registries.
-2. Publish corrective patch version: revert offending code, increment patch version, and promote to `master`.
+> **Downstream impact**: Libraries must be published before `infra`, `backend`, or `front-end` repos consume the new release. Refer to Section 8 for the full deployment order.
 
 ---
 
-## 7. Multi-Repository Platform Deployment Order
+## 7. Agent Decision & Confirmation Protocol
 
-When a task spans multiple repositories, execution and deployment must strictly follow this dependency chain:
+### 7.1 Confirm Before Acting
+
+When the next action is unclear, the agent **must stop and ask** before proceeding. Never guess.
+
+Situations requiring explicit confirmation:
+
+- Which branch to target when ambiguous.
+- Whether to proceed with a breaking API change or version bump type.
+- Whether a found issue is in scope for the current task.
+
+> **Rule**: A short clarifying question is always preferable to an incorrect autonomous action.
+
+### 7.2 No Guessing Root Causes
+
+When investigating a bug or failure, **do not assume a cause without evidence**.
+
+- Read the actual error output or failing test first.
+- If evidence is not accessible, ask: _"Can you share the output of `<command>` so I can confirm the root cause?"_
+- Only propose a fix after the cause is confirmed by observable output.
+
+---
+
+## 8. Multi-Repository Platform Deployment Order
+
+When a task spans multiple repositories, follow this dependency sequence strictly:
 
 1. **`libs`**: `dot-core`, `dot-error-utils`, `dot-ui-kit`, `doc-forge`, `dot-documentation-tool`
 2. **`infra`**: `dot-infra`
