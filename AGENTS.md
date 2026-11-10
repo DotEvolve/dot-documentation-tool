@@ -1,19 +1,8 @@
 # Agent Development & Operations Guide
 
-## Tier: Library (`libs`)
+## 1. Architectural Precedence
 
----
-
-## 1. Architectural Precedence & Steering Files
-
-Before planning or writing any code, inspect the repository's `.kiro/steering/` files:
-
-1. `.kiro/steering/product.md` — Package purpose, consumers, and API contracts.
-2. `.kiro/steering/structure.md` — Source layout, entry points, and export conventions.
-3. `.kiro/steering/tech.md` — Build tooling, peer dependencies, and testing setup.
-4. `.kiro/steering/deploy.md` — Registry targets, version bump rules, and publish workflow.
-
-> **Precedence Rule**: Local `.kiro/steering/` files are authoritative and supersede workspace or global defaults.
+Local `.kiro/` steering files (if present) or the instructions in this document serve as authoritative reference.
 
 ---
 
@@ -45,9 +34,15 @@ feature/*  ──(PR)──>  dev  ──(cut)──>  release/<calver>  ──(
 
 > **Rule**: Never commit directly to `dev` or `master`. All changes require a PR.
 
+### 3.1 Single Consolidated Feature PR Rule (No Fragmented PRs)
+
+> **Rule**: Opening multiple fragmented feature-to-`dev` PRs is strictly prohibited. Multiple related features, enhancements, bug fixes, or chores must be consolidated and merged into `dev` in a single combined PR.
+>
+> **Exception**: High-impact or breaking architectural migrations (e.g., major TypeScript 7 migration, breaking database engine overhauls, or breaking framework upgrades) may be opened as standalone dedicated PRs to isolate risk.
+
 ### Promotion Steps:
 
-1. **Feature → dev**: `git checkout dev && git pull origin dev && git checkout -b feat/<name>` → implement → verify → `git push -u origin feat/<name>` → `gh pr create --base dev`.
+1. **Feature → dev**: `git checkout dev && git pull origin dev && git checkout -b feat/<name>` → implement & consolidate related features/fixes into a single PR → verify → `git push -u origin feat/<name>` → `gh pr create --base dev`.
 2. **dev → release**: `git checkout dev && git pull origin dev && git checkout -b release/YYYY.0M.0D` → bump version in `package.json` → verify full test suite → `git push -u origin release/YYYY.0M.0D` → `gh pr create --base master --title "release: YYYY.0M.0D [dev -> master]"`.
 
 ---
@@ -94,8 +89,6 @@ After merging to `master`:
 2. Verify the package version is live in the target registry (see `.kiro/steering/deploy.md` for registry-specific commands).
 3. If publication fails, follow the **Rollback Procedure** in `.kiro/steering/deploy.md` (never unpublish — publish a corrective patch version).
 
-> **Downstream impact**: Libraries must be published before `infra`, `backend`, or `front-end` repos consume the new release. Refer to Section 8 for the full deployment order.
-
 ---
 
 ## 7. Agent Decision & Confirmation Protocol
@@ -109,6 +102,7 @@ Situations requiring explicit confirmation:
 - Which branch to target when ambiguous.
 - Whether to proceed with a breaking API change or version bump type.
 - Whether a found issue is in scope for the current task.
+- Modifying standardized configuration files (e.g., `tsconfig*.json`, `package.json` scripts/engines, `.eslintrc*`, `eslint.config.*`, `.prettierrc*`, `vite.config.*`).
 
 > **Rule**: A short clarifying question is always preferable to an incorrect autonomous action.
 
@@ -120,14 +114,15 @@ When investigating a bug or failure, **do not assume a cause without evidence**.
 - If evidence is not accessible, ask: _"Can you share the output of `<command>` so I can confirm the root cause?"_
 - Only propose a fix after the cause is confirmed by observable output.
 
+### 7.3 Standardized Configuration Protection Rule
+
+All configuration files for this library have been standardized (including `"types": ["node"]` and `"lib": ["ES2024"]` in `tsconfig*.json`, `package.json` engines/scripts, prettier, and eslint configs).
+
+- Agents **must not** modify, override, or revert standardized configuration files without explicit user permission.
+- If a dependency update, build failure, or new tooling requirement appears to necessitate altering compiler options, `types`, `lib`, scripts, or build targets, the agent **must halt and request explicit approval** before modifying any configuration file.
+
 ---
 
-## 8. Multi-Repository Platform Deployment Order
+## 8. Artifact & Documentation Persistence
 
-When a task spans multiple repositories, follow this dependency sequence strictly:
-
-1. **`libs`**: `dot-core`, `dot-error-utils`, `dot-ui-kit`, `doc-forge`, `dot-documentation-tool`
-2. **`infra`**: `dot-infra`
-3. **`backend`**: `dot-portal-api`, `floorix-api`, `govnix-api`, `perfxcel-api`, `govnix-workflow-service`, `civix-api`
-4. **`front-end`**: `dot-portal`, `floorix-admin`, `floorix-app`, `govnix-admin`, `govnix-app`, `govnix-mca-extension`, `perfxcel-admin`, `perfxcel-app`, `civix-admin`, `civix-app`
-5. **`marketing-websites`**: `dotevolve.net`, `floorix.net`, `govnix.net`, `dot-docs`
+All plans, analysis reports, architecture designs, and specifications generated by agents must be saved into documentation within this repository (in `docs/` or root-level markdown files).
