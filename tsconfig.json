@@ -2,7 +2,7 @@
   "compilerOptions": {
     "target": "ES2024",
     "module": "Node16",
-    "lib": ["ES2020"],
+    "lib": ["ES2024"],
     "outDir": "./dist",
     "rootDir": "./src",
     "strict": true,
