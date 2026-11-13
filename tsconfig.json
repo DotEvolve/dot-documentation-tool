@@ -1,7 +1,7 @@
 {
   "compilerOptions": {
     "target": "ES2024",
-    "module": "Node16",
+    "module": "Node20",
     "lib": ["ES2024"],
     "outDir": "./dist",
     "rootDir": "./src",
@@ -17,7 +17,6 @@
     "noUnusedParameters": true,
     "noImplicitReturns": true,
     "noFallthroughCasesInSwitch": true,
-    "moduleResolution": "Node16",
     "types": ["node", "jest"]
   },
   "include": ["src/**/*"],
